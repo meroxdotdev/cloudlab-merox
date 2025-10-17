@@ -1,0 +1,138 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./config:/app/config
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      PUID: 1000
+      PGID: 1000
+      HOMEPAGE_ALLOWED_HOSTS: "*"
+    restart: unless-stopped
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.10
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.homepage.rule=Host(`homepage.cloud.merox.dev`)"
+      - "traefik.http.routers.homepage.entrypoints=https"
+      - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
+      - "traefik.http.services.homepage.loadbalancer.server.port=3000"
+
+  glances:
+    image: nicolargo/glances:latest-full
+    container_name: glances
+    restart: unless-stopped
+    pid: host
+    ports:
+      - "61208:61208"
+    environment:
+      GLANCES_OPT: "-w"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /etc/os-release:/etc/os-release:ro
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.20
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.glances.rule=Host(`glances.cloud.merox.dev`)"
+      - "traefik.http.routers.glances.entrypoints=https"
+      - "traefik.http.routers.glances.tls.certresolver=cloudflare"
+      - "traefik.http.services.glances.loadbalancer.server.port=61208"
+
+  portainer:
+    image: portainer/portainer-ee:latest
+    container_name: portainer
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+      - "9443:9443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.30
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.cloud.merox.dev`)"
+      - "traefik.http.routers.portainer.entrypoints=https"
+      - "traefik.http.routers.portainer.tls.certresolver=cloudflare"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.services.portainer.loadbalancer.server.scheme=http"
+
+  code-server:
+    image: linuxserver/code-server:latest
+    container_name: code-server
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Bucharest
+      PASSWORD: yourpassword
+    volumes:
+      - code_server_config:/config
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.40
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.code.rule=Host(`code.cloud.merox.dev`)"
+      - "traefik.http.routers.code.entrypoints=https"
+      - "traefik.http.routers.code.tls.certresolver=cloudflare"
+      - "traefik.http.services.code.loadbalancer.server.port=8443"
+      - "traefik.http.services.code.loadbalancer.server.scheme=http"
+
+  pihole:
+    container_name: pihole
+    image: pihole/pihole:latest
+    ports:
+      - "53:53/tcp"
+      - "53:53/udp"
+      - "8078:80/tcp"
+    environment:
+      TZ: 'Europe/Bucharest'
+      FTLCONF_webserver_api_password: 'webpass12'
+      FTLCONF_dns_upstreams: '1.1.1.1;8.8.8.8'
+      FTLCONF_dns_listeningMode: 'all'
+      ServerIP: '100.72.22.38'
+      IPv6: 'false'
+    volumes:
+      - './etc-pihole:/etc/pihole'
+      - './etc-dnsmasq.d:/etc/dnsmasq.d'
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.53
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.pihole.rule=Host(`pihole.cloud.merox.dev`)"
+      - "traefik.http.routers.pihole.entrypoints=https"
+      - "traefik.http.routers.pihole.tls.certresolver=cloudflare"
+      - "traefik.http.services.pihole.loadbalancer.server.port=80"
+
+volumes:
+  portainer_data:
+  code_server_config:
+
+networks:
+  network-cloud-merox:
+    name: network-cloud-merox
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1 

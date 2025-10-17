@@ -1,0 +1,8 @@
+title: Homelab Dashboard
+theme: dark
+color: slate
+background:
+  image: https://images.unsplash.com/photo-1502134249126-9f3755a50d78
+  blur: sm
+  brightness: 50
+  opacity: 20

@@ -1,0 +1,15 @@
+```
+# Secrets și environment variables
+.env
+*.env
+secrets/
+*.key
+*.pem
+
+# Docker volumes și date
+volumes/
+data/
+
+# Logs
+*.log
+logs/
