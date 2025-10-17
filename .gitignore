@@ -1,15 +1,47 @@
-```
-# Secrets și environment variables
-.env
+# Secrets și credențiale
 *.env
-secrets/
+.env*
+*token*.txt
+*_token.txt
+*api*.txt
+cli_pw
+*password*
+
+# Chei și certificate private
 *.key
 *.pem
+*.p12
+*.pfx
+RootCA.*
+cert.crt
+cert.key
 
-# Docker volumes și date
-volumes/
-data/
+# Configurări cu credențiale
+kube.config
+acme.json
+acme.json.bak
 
-# Logs
+# Baze de date și cache-uri
+*.db
+*.db-shm
+*.db-wal
+gravity_backups/
+config_backups/
+migration_backup/
+*.etag
+*.sha1
+dhcp.leases
+
+# Logs și date temporare
 *.log
 logs/
+*.bak
+
+# Certificate TLS
+tls.crt
+tls.pem
+tls_ca.crt
+
+# Backup files
+*.backup
+*~
