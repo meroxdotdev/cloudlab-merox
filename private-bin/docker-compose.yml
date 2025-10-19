@@ -1,0 +1,28 @@
+services:
+  privatebin:
+    image: privatebin/nginx-fpm-alpine:latest
+    container_name: privatebin
+    restart: unless-stopped
+    read_only: true
+    user: "1000:1000"
+    ports:
+      - "8080:8080"  # Opțional - doar pentru acces direct (testing)
+    environment:
+      TZ: Europe/Bucharest
+      PHP_TZ: Europe/Bucharest
+    volumes:
+      - ./privatebin-data:/srv/data
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.50
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.privatebin.rule=Host(`privatebin.cloud.merox.dev`)"
+      - "traefik.http.routers.privatebin.entrypoints=https"
+      - "traefik.http.routers.privatebin.tls.certresolver=cloudflare"
+      - "traefik.http.services.privatebin.loadbalancer.server.port=8080"
+
+networks:
+  network-cloud-merox:
+    name: network-cloud-merox
+    external: true

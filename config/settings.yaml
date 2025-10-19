@@ -16,15 +16,15 @@ theme: dark
 color: gray
 iconStyle: theme
 
+
 # Background - Modern dark tech aesthetic
 background:
-  image: https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=2560&q=80
-  blur: lg
+  image: https://merox.dev/assets/homelab.webp
+  blur: xs
   saturate: 60
   brightness: 75
-  opacity: 15
-
-cardBlur: xs
+  opacity: 25
+cardBlur: xl
 
 # Favicon
 favicon: https://merox.dev/assets/img/favicons/favicon-32x32.png
@@ -139,18 +139,19 @@ instanceName: merox-main
 # API PROVIDERS
 # ============================================================================
 providers:
-  # OpenWeatherMap API
-  openweathermap: YOUR_API_KEY_HERE
-
 
   
   # Portainer API
   portainer:
     url: https://172.25.10.30:9443
-    key: supersecret
+    key: 
     
   # Add more providers as needed:
-  # proxmox:
-  #   url: https://10.57.57.254:8006
-  #   username: api@pam!gethomepage
-  #   password: your_token_here
+  proxmox:
+     url: https://10.57.57.254:8006
+     username: api@pam!gethomepage
+     password: 
+
+
+  longhorn:
+    url: http://10.57.57.80:30887/  # SAU http://longhorn-frontend.longhorn-system

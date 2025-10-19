@@ -45,4 +45,5 @@ tls_ca.crt
 # Backup files
 *.backup
 *~
-*phiole.toml
+kubeconfig.yaml
+etc-pihole/pihole.toml

@@ -1,4 +1,4 @@
 mode: default
 
-ingress: false
+ingress: true
 gateway: true

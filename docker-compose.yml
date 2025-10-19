@@ -3,8 +3,8 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     dns:
-      - 1.1.1.1      # Cloudflare DNS
-      - 8.8.8.8      # Google DNS
+      - 1.1.1.1
+      - 8.8.8.8
       - 100.72.22.38
     extra_hosts:
       - "traefik.cloud.merox.dev:100.72.22.38"
@@ -13,10 +13,13 @@ services:
     volumes:
       - ./config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/kubeconfig.yaml:/app/config/kubeconfig.yaml:ro
     environment:
       PUID: 1000
       PGID: 1000
       HOMEPAGE_ALLOWED_HOSTS: "*"
+      KUBECONFIG: /app/config/kubeconfig.yaml
+
     restart: unless-stopped
     networks:
       network-cloud-merox:

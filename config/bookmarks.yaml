@@ -52,11 +52,11 @@
           icon: mdi-cloud-outline
           description: DNS & CDN management
 
-    - Docker Hub:
+    - Code Smarter:
         - abbr: DH
-          href: https://hub.docker.com
-          icon: mdi-docker
-          description: Container registry
+          href: https://tools.merox.dev
+          icon: mdi-tools
+          description: Ultimate dev toolkit
 
     - Tailscale:
         - abbr: TS
