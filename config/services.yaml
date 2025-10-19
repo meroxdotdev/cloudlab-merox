@@ -1,253 +1,287 @@
 ---
-# Homepage Services Configuration
-# Replace URLs with your actual endpoints
+# Merox Infrastructure Services Configuration
+# Tab Structure: Cloud | OnPrem | Media
 
-# Cloud Infrastructure - merox.dev
+# ============================================================================
+# TAB 1: CLOUD - Cloud Services & Monitoring
+# ============================================================================
+
+# Cloud Infrastructure Services
 - Cloud Infrastructure:
+
     - Portainer:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/portainer.svg
-        href: https://one.merox.dev # Înlocuiește cu URL-ul tău
+        icon: portainer.png
+        href: https://one.merox.dev
         description: Container Management Platform
         widget:
           type: portainer
           url: https://172.25.10.30:9443
           env: 3
           key: ptr_ZII5XW7mxl91MjbPqmrx20qF0FlJrHbzeXCS7RHjw+o=
+
+    - Cloudflare Tunnel:
+        icon: cloudflare.png
+        href: https://one.dash.cloudflare.com/af2d61a35bdc3d2adf9ce1eaa1441382/home/quick-start
+        description: Cloudflare
+        widget:
+          type: cloudflared
+          accountid: af2d61a35bdc3d2adf9ce1eaa1441382
+          tunnelid: 0fb9de70-9c20-44d6-bfc9-bd03751273fa
+          key: 
+          fields: ["status"]
+
+    - Tailscale Mesh:
+        icon: tailscale.png
+        href: https://login.tailscale.com/admin/machines
+        description: Mesh VPN Network
+        widget:
+          type: tailscale
+          deviceid: nnFnxje5kG11CNTRL
+          key: tskey-api-
+          fields: ["last_seen", "expires"]
+
+    - PiHole:
+        icon: sh-pi-hole
+        href: http://pihole.cloud.merox.dev/admin/login
+        description: Network-wide Ad Blocking
+        widget:
+          type: pihole
+          url: https://172.25.10.53
+          version: 6
+          key: webpass12
+
+
+
+    - Traefik:
+        icon: traefik.png
+        href: http://traefik.cloud.merox.dev
+        description: Reverse Proxy & Load Balancer
+#        widget:
+#          type: traefik
+#          url: https://traefik.cloud.merox.dev/
+#          username: merox # optional
+
           
     - MinIO:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/minio.svg
-        href: http://minio.cloud.merox.dev # Înlocuiește cu URL-ul tău
-        description: Object Storage Server
-#        widget:
-#          type: customapi
-#          url: http://minio:9001/api/v1/service-status # Înlocuiește cu URL-ul tău
-          
+        icon: minio.png
+        href: http://minio.cloud.merox.dev
+        description: S3-Compatible Object Storage
+
     - VS Code:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/vscode.svg
-        href: http://code.cloud.merox.dev # Înlocuiește cu URL-ul tău
-        description: Web-based Code Editor
+        icon: vscode.png
+        href: http://code.cloud.merox.dev
+        description: Cloud IDE & Development
 
-    - Glances:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/glances.svg
-        href: http://glances.cloud.merox.dev # Înlocuiește cu URL-ul tău
-        description: Web-based Monitoring
+    - Netdata:
+        icon: netdata.png
+        href: https://netdata.cloud.merox.dev
+        description: Real-time Performance Analytics
+        widget:
+          type: netdata
+          url: http://172.25.0.2:19999
 
-# System Monitoring
+
+# Real-time System Monitoring Widgets
 - System Monitoring:
-    - System Info:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/glances.svg
-        description: Overall System Information
+
+    - System Overview:
+        icon: mdi-chip
+        description: Hardware & OS Information
         widget:
           type: glances
           url: http://172.25.10.20:61208
           version: 4
           metric: info
           
-    - CPU Usage:
-        icon: si-cpu
-        description: Processor Utilization
+    - CPU Monitor:
+        icon: mdi-cpu-64-bit
+        description: Processor Utilization & Load
         widget:
           type: glances
-          version: 4
           url: http://172.25.10.20:61208
+          version: 4
           metric: cpu
           
-    - Memory Usage:
-        icon: si-memory
-        description: RAM Utilization
+    - Memory Status:
+        icon: mdi-memory
+        description: RAM & Swap Usage
         widget:
           type: glances
           url: http://172.25.10.20:61208
           version: 4
           metric: memory
           
-    - Network Usage:
-        icon: si-network
-        description: Network Traffic Monitor
+    - Network Traffic:
+        icon: mdi-ethernet
+        description: Interface Bandwidth Monitor
         widget:
           type: glances
-          version: 4
           url: http://172.25.10.20:61208
+          version: 4
           metric: network:eth0
           
-    - Disk IO:
-        icon: si-harddisk
-        description: Storage Performance
+    - Disk Performance:
+        icon: mdi-harddisk
+        description: Storage I/O Operations
         widget:
           type: glances
           url: http://172.25.10.20:61208
           version: 4
           metric: disk:sda
           
-    - Process Monitor:
-        icon: si-processes
-        description: Running Processes
+    - Process List:
+        icon: mdi-application-cog
+        description: Active System Processes
         widget:
           type: glances
-          version: 4
           url: http://172.25.10.20:61208
+          version: 4
           metric: process
 
-# On-Premises Infrastructure
-- On-Premises Infrastructure:
-    # Infrastructure Management
-    - Infrastructure:
-        - Proxmox Node 1:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-            href: https://pve1.merox.dev:8006 # Înlocuiește cu URL-ul tău
-            description: Virtualization Host 1
-#            widget:
-#              type: proxmox
-#              url: https://pve1.merox.dev:8006 # Înlocuiește cu URL-ul tău
-#              username: # Add username@pam or username@pve
-#              password: # Add password
-              
-        - Proxmox Node 2:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-            href: https://pve2.merox.dev:8006 # Înlocuiește cu URL-ul tău
-            description: Virtualization Host 2
- #           widget:
- #             type: proxmox
- #             url: https://pve2.merox.dev:8006 # Înlocuiește cu URL-ul tău
- #             username: # Add username@pam or username@pve
- #             password: # Add password
-              
-        - Proxmox Node 3:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-            href: https://pve3.merox.dev:8006 # Înlocuiește cu URL-ul tău
-            description: Virtualization Host 3
-  #          widget:
-  #            type: proxmox
-  #            url: https://pve3.merox.dev:8006 # Înlocuiește cu URL-ul tău
-  #            username: # Add username@pam or username@pve
-  #            password: # Add password
-              
-        - Kubernetes Dashboard:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/kubernetes.svg
-            href: https://k8s.merox.dev # Înlocuiește cu URL-ul tău
-            description: K8s Cluster Management
-            
-        - Synology NAS:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/synology.svg
-            href: https://nas.merox.dev:5001 # Înlocuiește cu URL-ul tău
-            description: Network Attached Storage
-            widget:
-              type: diskstation
-              url: https://nas.merox.dev:5001 # Înlocuiește cu URL-ul tău
-              username: # Add username
-              password: # Add password
-              
-        - iDRAC Remote:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/dell.svg
-            href: https://idrac.merox.dev # Înlocuiește cu URL-ul tău
-            description: Dell Remote Management
+# ============================================================================
+# TAB 2: ONPREM - Network, Servers & Kubernetes
+# ============================================================================
 
-    # Kubernetes Ecosystem
-    - Kubernetes:
-        - Longhorn:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/longhorn.svg
-            href: http://longhorn.merox.dev # Înlocuiește cu URL-ul tău
-            description: Distributed Block Storage
-            
-        - Grafana:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/grafana.svg
-            href: http://grafana.merox.dev # Înlocuiește cu URL-ul tău
-            description: Monitoring Dashboards
-            
-        - Prometheus:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/prometheus.svg
-            href: http://prometheus.merox.dev:9090 # Înlocuiește cu URL-ul tău
-            description: Metrics Collection
-            widget:
-              type: prometheus
-              url: http://prometheus.merox.dev:9090 # Înlocuiește cu URL-ul tău
-              
-        - Alertmanager:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/alertmanager.svg
-            href: http://alertmanager.merox.dev:9093 # Înlocuiește cu URL-ul tău
-            description: Alert Routing & Grouping
+# Network Infrastructure
+- Network Infrastructure:
 
-    # Network Management
-    - Network:
-        - pfSense:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/pfsense.svg
-            href: https://pfsense.merox.dev # Înlocuiește cu URL-ul tău
-            description: Firewall & Router
-            widget:
-              type: pfsense
-              url: https://pfsense.merox.dev # Înlocuiește cu URL-ul tău
-              username: # Add username
-              password: # Add password
-              
-        - TP-Link:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/tp-link.svg
-            href: http://tplink.merox.dev # Înlocuiește cu URL-ul tău
-            description: Network Switch Management
-            
-        - Speedtest:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/speedtest-tracker.svg
-            href: http://speedtest.merox.dev # Înlocuiește cu URL-ul tău
-            description: Internet Speed Testing
-            widget:
-              type: speedtest
-              url: http://speedtest.merox.dev # Înlocuiește cu URL-ul tău
+    - Speedtest Tracker:
+        icon: https://camo.githubusercontent.com/4ccc83cf6b1f06e999c378bda264433ec83994031c156a5c88876b53eb57b201/68747470733a2f2f692e696d6775722e636f6d2f61436d413672482e706e67
+        href: http://speedtest.merox.dev
+        description: Automated Speed Testing
+        widget:
+          type: myspeed
+          url: http://10.57.57.62:5216
+          
+    - pfSense Firewall:
+        icon: pfsense.png
+        href: https://pfsense.merox.dev
+        description: Network Security Gateway
+        ping: 10.57.57.1
+          
+    - TP-Link WiFi:
+        icon: mdi-wifi
+        href: http://tplink.merox.dev
+        description: Network WiFi
 
-    # Media & Content Management
-    - Content Management:
-        - Radarr:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/radarr.svg
-            href: http://radarr.merox.dev:7878 # Înlocuiește cu URL-ul tău
-            description: Movie Collection Manager
-            widget:
-              type: radarr
-              url: http://radarr.merox.dev:7878 # Înlocuiește cu URL-ul tău
-              key: # Add your API key
-              
-        - Sonarr:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/sonarr.svg
-            href: http://sonarr.merox.dev:8989 # Înlocuiește cu URL-ul tău
-            description: TV Series Manager
-            widget:
-              type: sonarr
-              url: http://sonarr.merox.dev:8989 # Înlocuiește cu URL-ul tău
-              key: # Add your API key
-              
-        - qBittorrent:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/qbittorrent.svg
-            href: http://qbittorrent.merox.dev:8080 # Înlocuiește cu URL-ul tău
-            description: Torrent Client
-            widget:
-              type: qbittorrent
-              url: http://qbittorrent.merox.dev:8080 # Înlocuiește cu URL-ul tău
-              username: # Add username
-              password: # Add password
-              
-        - Prowlarr:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/prowlarr.svg
-            href: http://prowlarr.merox.dev:9696 # Înlocuiește cu URL-ul tău
-            description: Indexer Manager
-            widget:
-              type: prowlarr
-              url: http://prowlarr.merox.dev:9696 # Înlocuiește cu URL-ul tău
-              key: # Add your API key
-              
-        - Jellyseerr:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/jellyseerr.svg
-            href: http://jellyseerr.merox.dev:5055 # Înlocuiește cu URL-ul tău
-            description: Media Request Management
-            widget:
-              type: jellyseerr
-              url: http://jellyseerr.merox.dev:5055 # Înlocuiește cu URL-ul tău
-              key: # Add your API key
-              
-        - Jellyfin:
-            icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/jellyfin.svg
-            href: http://jellyfin.merox.dev:8096 # Înlocuiește cu URL-ul tău
-            description: Media Server
-            widget:
-              type: jellyfin
-              url: http://jellyfin.merox.dev:8096 # Înlocuiește cu URL-ul tău
-              key: # Add your API key
-              enableBlocks: true
-              enableNowPlaying: true 
- 
+
+# Core Infrastructure (Servers & Storage)
+- Core Infrastructure:
+
+    - Proxmox VE:
+        icon: proxmox.png
+        href: https://pve1.merox.dev
+        description: Virtualization Platform
+        ping: 10.57.57.254
+        widget:
+          type: proxmox
+          url: https://10.57.57.254:8006
+          username: api@pam!gethomepage
+          password: 
+        
+    - Synology NAS:
+        icon: synology.png
+        href: https://nas.merox.dev
+        description: Centralized Storage System
+        widget:
+          type: diskstation
+          url: https://10.57.57.201:5001/
+          username: remote_stats
+          password: 
+          volume: volume_1
+        
+    - iDRAC Console:
+        icon: mdi-server
+        href: https://idrac.merox.dev
+        description: Dell Server Management
+        ping: 10.57.57.249
+
+
+# Kubernetes Cluster & Tools
+- Kubernetes Ecosystem:
+
+    - K8s Dashboard:
+        icon: kubernetes.png
+        href: https://dashboard.k8s.merox.dev
+        description: Cluster Management UI
+
+    - Longhorn Storage:
+        icon: longhorn.png
+        href: http://longhorn.k8s.merox.dev
+        description: Cloud-Native Block Storage
+        
+    - Grafana:
+        icon: grafana.png
+        href: http://grafana.k8s.merox.dev
+        description: Metrics Visualization
+        
+    - Prometheus:
+        icon: prometheus.png
+        href: http://prometheus.k8s.merox.dev
+        description: Monitoring & Alerting
+          
+    - Alertmanager:
+        icon: mdi-bell-alert
+        href: http://alertmanager.k8s.merox.dev
+        description: Alert Distribution
+
+
+# ============================================================================
+# TAB 3: MEDIA - Streaming & Content Management
+# ============================================================================
+
+# Media Streaming Services
+- Media Services:
+
+    - Jellyfin:
+        icon: jellyfin.png
+        href: https://media.merox.dev
+        description: Personal Media Streaming
+        widget:
+          type: jellyfin
+          url: http://10.57.57.80:30096
+          key: ef29690b46024c5cb84a0a0aefc808ab
+          enableBlocks: true
+          enableNowPlaying: true
+          enableUser: true
+          enableMediaControl: false  # Disable play/pause controls
+          showEpisodeNumber: true
+          expandOneStreamToTwoRows: false
+
+    - Jellyseerr:
+        icon: jellyseerr.png
+        href: https://jellyseerr.k8s.merox.dev/login
+        description: Media Request Platform
+        widget:
+          type: jellyseerr
+          url: http://10.57.57.80:30055
+          key: MTc1MTI3NjgxMjg5MWM0Yjk1OGQ4LWU0YTMtNDJiMi1iYmQyLTI5NmIyNGNlOWU2Yw==
+
+    - qBittorrent:
+        icon: qbittorrent.png
+        href: https://qbittorrent.k8s.merox.dev
+        description: Torrent Download Client
+        widget:
+          type: qbittorrent
+          url: http://10.57.57.80:30080
+          username: admin
+          password: Think5797!!21
+
+
+# Media Management Tools
+- Media Management:
+
+    - Radarr:
+        icon: radarr.png
+        href: https://radarr.k8s.merox.dev/
+        description: Movie Collection Manager
+        
+    - Sonarr:
+        icon: sonarr.png
+        href: https://sonarr.k8s.merox.dev/
+        description: TV Series Automation
+        
+    - Prowlarr:
+        icon: prowlarr.png
+        href: https://prowlarr.k8s.merox.dev/
+        description: Indexer Aggregator

@@ -1,0 +1,46 @@
+---
+# Merox Infrastructure - Information Widgets
+# Displayed in the header across all tabs
+
+# ============================================================================
+# LOCATION & TIME INFORMATION
+# ============================================================================
+
+
+
+# Weather Widget - Timișoara, Romania
+#- openweathermap:
+#    label: Timișoara
+#    latitude: 45.7489
+#    longitude: 21.2087
+#    units: metric
+#    provider: openweathermap
+#    cache: 5
+#    format:
+#      maximumFractionDigits: 1
+
+# Date & Time Widget - Romania
+- datetime:
+    text_size: xl
+    format:
+      dateStyle: long
+      timeStyle: short
+      hour12: false
+      locale: ro-RO
+
+# ============================================================================
+# SEARCH
+# ============================================================================
+
+# Search Widget
+#- search:
+#    provider: duckduckgo
+#    focus: false
+#    target: _blank
+#    showSearchSuggestions: true
+
+- greeting:
+    text: "Inside Merox.dev"
+    text_size: xl
+
+

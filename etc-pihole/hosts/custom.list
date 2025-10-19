@@ -17,7 +17,7 @@
 #                       WITHIN /etc/dnsmasq.d/yourname.conf                      #
 #    (make sure misc.etc_dnsmasq_d is set to true in /etc/pihole/pihole.toml)    #
 #                                                                                #
-#                     Last updated: 2025-10-17 21:31:25 EEST                     #
+#                     Last updated: 2025-10-18 21:17:50 EEST                     #
 #                              by FTL version v6.2.3                             #
 #                                                                                #
 ##################################################################################
@@ -29,6 +29,7 @@
 100.72.22.38 glances.cloud.merox.dev
 100.72.22.38 homepage.cloud.merox.dev
 100.72.22.38 minio.cloud.merox.dev
+100.72.22.38 netdata.cloud.merox.dev
 
 
-# There are 7 entries in this file
+# There are 8 entries in this file

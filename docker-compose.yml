@@ -2,6 +2,12 @@ services:
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
+    dns:
+      - 1.1.1.1      # Cloudflare DNS
+      - 8.8.8.8      # Google DNS
+      - 100.72.22.38
+    extra_hosts:
+      - "traefik.cloud.merox.dev:100.72.22.38"
     ports:
       - "3000:3000"
     volumes:
@@ -127,6 +133,7 @@ services:
 volumes:
   portainer_data:
   code_server_config:
+
 
 networks:
   network-cloud-merox:

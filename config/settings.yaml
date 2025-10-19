@@ -1,274 +1,156 @@
 ---
-# Homepage Services Configuration - WIDE HORIZONTAL LAYOUT
-# Optimizat pentru distribuție orizontală maximă
+# Merox Infrastructure Dashboard - Settings Configuration
+# Optimized for multi-tab layout with comprehensive monitoring
 
-# Prima linie - Cloud & Monitoring principale
-- Cloud & Monitoring:
-    # Cloud Services
-    - Portainer:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/portainer.svg
-        href: https://one.merox.dev
-        description: Container Management
-        widget:
-          type: portainer
-          url: http://portainer:9000
-          env: 1
-          key: # Add API key
-          
-    - MinIO:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/minio.svg
-        href: http://minio.merox.dev
-        description: Object Storage
-        
-    - VS Code:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/vscode.svg
-        href: http://code.merox.dev
-        description: Web IDE
-        
-    # Monitoring principale
-    - System Info:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/glances.svg
-        description: System Overview
-        widget:
-          type: glances
-          url: http://glances:61208
-          version: 4
-          metric: info
-          
-    - CPU Monitor:
-        icon: si-cpu
-        description: CPU Usage
-        widget:
-          type: glances
-          version: 4
-          url: http://glances:61208
-          metric: cpu
-          
-    - Memory Monitor:
-        icon: si-memory
-        description: RAM Usage
-        widget:
-          type: glances
-          url: http://glances:61208
-          version: 4
-          metric: memory
+# ============================================================================
+# PAGE IDENTITY
+# ============================================================================
+title: Inside Merox Infrastructure
+description: Unified Cloud, On-Premises & Media Infrastructure Management
+startUrl: https://inside.merox.dev
 
-# A doua linie - Metrici sistem
-- System Metrics:
-    - Network Traffic:
-        icon: si-network
-        description: Network I/O
-        widget:
-          type: glances
-          version: 4
-          url: http://glances:61208
-          metric: network:docker0
-          
-    - Disk Performance:
-        icon: si-harddisk
-        description: Disk I/O
-        widget:
-          type: glances
-          url: http://glances:61208
-          version: 4
-          metric: disk:sda
-          
-    - Process Monitor:
-        icon: si-processes
-        description: Processes
-        widget:
-          type: glances
-          version: 4
-          url: http://glances:61208
-          metric: process
-          
-    - Docker Stats:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/docker.svg
-        href: http://docker.merox.dev
-        description: Container Stats
-        
-    - System Uptime:
-        icon: mdi-clock-check
-        href: http://uptime.merox.dev
-        description: Uptime Monitor
-        
-    - Temperatures:
-        icon: mdi-thermometer
-        href: http://temps.merox.dev
-        description: Thermal Status
+# ============================================================================
+# VISUAL THEME
+# ============================================================================
+theme: dark
+color: gray
+iconStyle: theme
 
-# A treia linie - Infrastructure Management
-- Infrastructure:
-    - Proxmox Node 1:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-        href: https://pve1.merox.dev:8006
-        description: PVE Cluster Node 1
-        widget:
-          type: proxmox
-          url: https://pve1.merox.dev:8006
-          username: # Add username@pam
-          password: # Add password
-          
-    - Proxmox Node 2:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-        href: https://pve2.merox.dev:8006
-        description: PVE Cluster Node 2
-        widget:
-          type: proxmox
-          url: https://pve2.merox.dev:8006
-          username: # Add username@pam
-          password: # Add password
-          
-    - Proxmox Node 3:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/proxmox.svg
-        href: https://pve3.merox.dev:8006
-        description: PVE Cluster Node 3
-        widget:
-          type: proxmox
-          url: https://pve3.merox.dev:8006
-          username: # Add username@pam
-          password: # Add password
-          
-    - K8s Dashboard:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/kubernetes-dashboard.svg
-        href: https://k8s.merox.dev
-        description: Kubernetes Control
-        
-    - Synology NAS:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/synology.svg
-        href: https://nas.merox.dev:5001
-        description: Network Storage
-        widget:
-          type: diskstation
-          url: https://nas.merox.dev:5001
-          username: # Add username
-          password: # Add password
-          
-    - iDRAC Remote:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/dell.svg
-        href: https://idrac.merox.dev
-        description: Server Management
+# Background - Modern dark tech aesthetic
+background:
+  image: https://images.unsplash.com/photo-1639322537228-f710d846310a?auto=format&fit=crop&w=2560&q=80
+  blur: lg
+  saturate: 60
+  brightness: 75
+  opacity: 15
 
-# A patra linie - Kubernetes Tools
-- Kubernetes Tools:
-    - Longhorn:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/longhorn.svg
-        href: http://longhorn.merox.dev
-        description: Storage System
-        
-    - Grafana:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/grafana.svg
-        href: http://grafana.merox.dev
-        description: Dashboards
-        
-    - Prometheus:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/prometheus.svg
-        href: http://prometheus.merox.dev:9090
-        description: Metrics
-        widget:
-          type: prometheus
-          url: http://prometheus.merox.dev:9090
-          
-    - Alertmanager:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/alertmanager.svg
-        href: http://alertmanager.merox.dev:9093
-        description: Alerts
+cardBlur: xs
 
-# A cincea linie - Network & Media principale
-- Network & Media:
-    # Network
-    - pfSense:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/pfsense.svg
-        href: https://pfsense.merox.dev
-        description: Firewall
-        widget:
-          type: pfsense
-          url: https://pfsense.merox.dev
-          username: # Add username
-          password: # Add password
-          
-    - TP-Link:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/tp-link.svg
-        href: http://tplink.merox.dev
-        description: Switch
-        
-    - Speedtest:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/speedtest-tracker.svg
-        href: http://speedtest.merox.dev
-        description: Speed Test
-        widget:
-          type: speedtest
-          url: http://speedtest.merox.dev
-          
-    # Media principale
-    - Jellyfin:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/jellyfin.svg
-        href: http://jellyfin.merox.dev:8096
-        description: Media Server
-        widget:
-          type: jellyfin
-          url: http://jellyfin.merox.dev:8096
-          key: # Add API key
-          
-    - Jellyseerr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/jellyseerr.svg
-        href: http://jellyseerr.merox.dev:5055
-        description: Requests
-        widget:
-          type: jellyseerr
-          url: http://jellyseerr.merox.dev:5055
-          key: # Add API key
-          
-    - qBittorrent:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/qbittorrent.svg
-        href: http://qbittorrent.merox.dev:8080
-        description: Torrents
-        widget:
-          type: qbittorrent
-          url: http://qbittorrent.merox.dev:8080
-          username: # Add username
-          password: # Add password
+# Favicon
+favicon: https://merox.dev/assets/img/favicons/favicon-32x32.png
 
-# A șasea linie - Media Services
-- Media Services:
-    - Radarr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/radarr.svg
-        href: http://radarr.merox.dev:7878
-        description: Movies
-        widget:
-          type: radarr
-          url: http://radarr.merox.dev:7878
-          key: # Add API key
-          
-    - Sonarr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/sonarr.svg
-        href: http://sonarr.merox.dev:8989
-        description: TV Shows
-        widget:
-          type: sonarr
-          url: http://sonarr.merox.dev:8989
-          key: # Add API key
-          
-    - Prowlarr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/prowlarr.svg
-        href: http://prowlarr.merox.dev:9696
-        description: Indexers
-        widget:
-          type: prowlarr
-          url: http://prowlarr.merox.dev:9696
-          key: # Add API key
-          
-    - Bazarr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/bazarr.svg
-        href: http://bazarr.merox.dev:6767
-        description: Subtitles
-        
-    - Tautulli:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/tautulli.svg
-        href: http://tautulli.merox.dev:8181
-        description: Stats
-        
-    - Overseerr:
-        icon: https://cdn.jsdelivr.net/gh/walkxcode/dashboard-icons@master/svg/overseerr.svg
-        href: http://overseerr.merox.dev:5055
-        description: Requests Alt 
+# ============================================================================
+# LAYOUT CONFIGURATION
+# ============================================================================
+layout:
+  # -------------------------------------------------------------------------
+  # TAB 1: CLOUD - Cloud Services & Monitoring
+  # -------------------------------------------------------------------------
+  Cloud Infrastructure:
+    tab: Cloud
+    style: row
+    columns: 4
+    icon: mdi-cloud-outline
+    useEqualHeights: true
+    
+  System Monitoring:
+    tab: Cloud
+    style: row
+    columns: 6
+    icon: mdi-monitor-dashboard
+    useEqualHeights: true
+
+  # -------------------------------------------------------------------------
+  # TAB 2: ON-PREM - On-Premises Infrastructure
+  # -------------------------------------------------------------------------
+  Network Infrastructure:
+    tab: On-Prem
+    style: row
+    columns: 3
+    icon: mdi-network
+    useEqualHeights: true
+    
+  Core Infrastructure:
+    tab: On-Prem
+    style: row
+    columns: 3
+    icon: mdi-server
+    useEqualHeights: true
+      
+  Kubernetes Ecosystem:
+    tab: On-Prem
+    style: row
+    columns: 5
+    icon: kubernetes.png
+    useEqualHeights: true
+
+  # -------------------------------------------------------------------------
+  # TAB 3: MEDIA - Content Management & Streaming
+  # -------------------------------------------------------------------------
+  Media Services:
+    tab: Media
+    style: row
+    columns: 3
+    icon: mdi-filmstrip
+    useEqualHeights: true
+    
+  Media Management:
+    tab: Media
+    style: row
+    columns: 4
+    icon: mdi-cog-outline
+    useEqualHeights: true
+
+# ============================================================================
+# DISPLAY OPTIONS
+# ============================================================================
+fullWidth: true
+maxGroupColumns: 6
+maxBookmarkGroupColumns: 6
+disableCollapse: false
+groupsInitiallyCollapsed: false
+useEqualHeights: true
+
+# ============================================================================
+# HEADER STYLE
+# ============================================================================
+headerStyle: boxedWidgets
+
+# ============================================================================
+# QUICK LAUNCH
+# ============================================================================
+quicklaunch:
+  searchDescriptions: true
+  hideInternetSearch: false
+  showSearchSuggestions: true
+  hideVisitURL: false
+  provider: duckduckgo
+  mobileButtonPosition: bottom-right
+
+# ============================================================================
+# DOCKER & KUBERNETES
+# ============================================================================
+showStats: true
+statusStyle: dot
+
+# ============================================================================
+# SYSTEM
+# ============================================================================
+hideVersion: false
+disableUpdateCheck: false
+language: en
+target: _blank
+hideErrors: false
+
+# Instance identification for multi-homepage deployments
+instanceName: merox-main
+
+# ============================================================================
+# API PROVIDERS
+# ============================================================================
+providers:
+  # OpenWeatherMap API
+  openweathermap: YOUR_API_KEY_HERE
+
+
+  
+  # Portainer API
+  portainer:
+    url: https://172.25.10.30:9443
+    key: supersecret
+    
+  # Add more providers as needed:
+  # proxmox:
+  #   url: https://10.57.57.254:8006
+  #   username: api@pam!gethomepage
+  #   password: your_token_here

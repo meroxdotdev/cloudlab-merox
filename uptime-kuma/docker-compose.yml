@@ -1,0 +1,14 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:latest
+    container_name: uptime-kuma
+    restart: always
+    ports:
+      - "3001:3001" # Portul pe care va fi accesibil Uptime Kuma
+    volumes:
+      - /srv/docker/monitoring/uptime-kuma:/app/data # Montarea volumului pentru stocarea datelor pe host
+    networks:
+      - vps_isolated
+networks:
+  vps_isolated:
+    external: true

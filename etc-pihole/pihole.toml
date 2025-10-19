@@ -1,7 +1,7 @@
 # Pi-hole configuration file (v6.2.3)
 # Encoding: UTF-8
 # This file is managed by pihole-FTL
-# Last updated on 2025-10-17 21:31:25 EEST
+# Last updated on 2025-10-18 21:17:50 EEST
 
 [dns]
   # Array of upstream DNS servers used by Pi-hole
@@ -107,7 +107,8 @@
     "100.72.22.38 pihole.cloud.merox.dev",
     "100.72.22.38 glances.cloud.merox.dev",
     "100.72.22.38 homepage.cloud.merox.dev",
-    "100.72.22.38 minio.cloud.merox.dev"
+    "100.72.22.38 minio.cloud.merox.dev",
+    "100.72.22.38 netdata.cloud.merox.dev"
   ] ### CHANGED, default = []
 
   # If set, A and AAAA queries for plain names, without dots or domain parts, are never
