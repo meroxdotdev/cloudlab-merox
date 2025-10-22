@@ -43,21 +43,55 @@
   notify: restart cron
   tags: ['setup', 'timezone']
 
-- name: Ensure NTP is installed and enabled
-  ansible.builtin.apt:
-    name: 
-      - ntp
-      - ntpdate
-    state: present
+- name: Check if systemd-timesyncd is available
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+  register: timesyncd_status
+  failed_when: false
   when: enable_ntp
   tags: ['setup', 'ntp']
 
-- name: Enable and start NTP service
+- name: Ensure systemd-timesyncd is enabled and started (Ubuntu 24.04+)
   ansible.builtin.systemd:
-    name: ntp
+    name: systemd-timesyncd
     enabled: yes
     state: started
-  when: enable_ntp
+  when: 
+    - enable_ntp
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version|int >= 24
+  tags: ['setup', 'ntp']
+
+- name: Install chrony for older systems (Ubuntu < 24 or Debian)
+  ansible.builtin.apt:
+    name: chrony
+    state: present
+  when: 
+    - enable_ntp
+    - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 24)
+  tags: ['setup', 'ntp']
+
+- name: Enable and start chrony service
+  ansible.builtin.systemd:
+    name: chrony
+    enabled: yes
+    state: started
+  when: 
+    - enable_ntp
+    - not (ansible_distribution == 'Ubuntu' and ansible_distribution_major_version|int >= 24)
+  tags: ['setup', 'ntp']
+
+- name: Configure timezone for timesyncd
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/timesyncd.conf
+    regexp: '^#?NTP='
+    line: 'NTP=0.ubuntu.pool.ntp.org 1.ubuntu.pool.ntp.org'
+    state: present
+  when: 
+    - enable_ntp
+    - ansible_distribution == 'Ubuntu'
+    - ansible_distribution_major_version|int >= 24
+  notify: restart timesyncd
   tags: ['setup', 'ntp']
 
 - name: Configure UFW defaults
