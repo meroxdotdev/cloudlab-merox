@@ -12,8 +12,11 @@
   roles:
     - role: initial_setup
       tags: ['initial_setup']
+    
+    - role: tailscale_exit_node
+      tags: ['tailscale']
 
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
-        msg: "Initial setup completed successfully for {{ inventory_hostname }}"
+        msg: "Setup completed successfully for {{ inventory_hostname }}"

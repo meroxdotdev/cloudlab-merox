@@ -1,5 +1,5 @@
 [vps_servers]
-10.57.57.57
+91.98.145.35
 
 [all:vars]
 ansible_python_interpreter=/usr/bin/python3

@@ -1,0 +1,9 @@
+---
+# Tailscale exit node configuration
+tailscale_auth_key: "{{ vault_tailscale_auth_key }}"
+tailscale_tags: ""
+enable_exit_node: true
+enable_ipv4_forwarding: true
+enable_ipv6_forwarding: true
+accept_routes: true
+accept_dns: true

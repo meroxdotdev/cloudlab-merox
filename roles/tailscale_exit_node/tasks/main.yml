@@ -1,0 +1,104 @@
+---
+# Tailscale exit node setup
+
+- name: Install curl if not present
+  ansible.builtin.apt:
+    name: curl
+    state: present
+  tags: ['tailscale', 'install']
+
+- name: Download Tailscale GPG key with curl
+  ansible.builtin.shell: |
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg -o /usr/share/keyrings/tailscale-archive-keyring.gpg
+  args:
+    creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
+  tags: ['tailscale', 'install']
+
+- name: Add Tailscale repository
+  ansible.builtin.apt_repository:
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu noble main"
+    state: present
+    filename: tailscale
+  tags: ['tailscale', 'install']
+
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: yes
+  tags: ['tailscale', 'install']
+
+- name: Install Tailscale
+  ansible.builtin.apt:
+    name: tailscale
+    state: present
+  tags: ['tailscale', 'install']
+
+- name: Enable IPv4 forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^#?net.ipv4.ip_forward'
+    line: 'net.ipv4.ip_forward=1'
+    state: present
+  when: enable_ipv4_forwarding
+  notify: reload sysctl
+  tags: ['tailscale', 'network']
+
+- name: Enable IPv6 forwarding
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^#?net.ipv6.conf.all.forwarding'
+    line: 'net.ipv6.conf.all.forwarding=1'
+    state: present
+  when: enable_ipv6_forwarding
+  notify: reload sysctl
+  tags: ['tailscale', 'network']
+
+- name: Apply sysctl settings immediately
+  ansible.builtin.command: sysctl -p
+  changed_when: false
+  tags: ['tailscale', 'network']
+
+- name: Check if Tailscale is already connected
+  ansible.builtin.command: tailscale status
+  register: tailscale_status
+  failed_when: false
+  changed_when: false
+  tags: ['tailscale', 'config']
+
+- name: Authenticate Tailscale with exit node advertisement
+  ansible.builtin.command: >
+    tailscale up
+    --reset
+    --authkey={{ tailscale_auth_key }}
+    --advertise-exit-node
+    {% if accept_routes %}--accept-routes{% endif %}
+    {% if accept_dns %}--accept-dns{% endif %}
+    {% if tailscale_tags %}--advertise-tags={{ tailscale_tags }}{% endif %}
+  when: "'Logged out' in tailscale_status.stdout or tailscale_status.rc != 0"
+  tags: ['tailscale', 'config']
+#  no_log: true
+
+- name: Allow Tailscale through UFW
+  community.general.ufw:
+    rule: allow
+    interface: tailscale0
+    direction: in
+  tags: ['tailscale', 'firewall']
+
+
+- name: Enable Tailscale service
+  ansible.builtin.systemd:
+    name: tailscaled
+    enabled: yes
+    state: started
+  tags: ['tailscale', 'service']
+
+- name: Get Tailscale status
+  ansible.builtin.command: tailscale status
+  register: tailscale_final_status
+  changed_when: false
+  tags: ['tailscale', 'verify']
+
+- name: Display Tailscale status
+  ansible.builtin.debug:
+    var: tailscale_final_status.stdout_lines
+  tags: ['tailscale', 'verify']
