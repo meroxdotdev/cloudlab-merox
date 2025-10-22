@@ -1,0 +1,19 @@
+---
+- name: Initial VPS Setup - Debian/Ubuntu
+  hosts: vps_servers
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Display starting message
+      ansible.builtin.debug:
+        msg: "Starting initial setup for {{ inventory_hostname }}"
+
+  roles:
+    - role: initial_setup
+      tags: ['initial_setup']
+
+  post_tasks:
+    - name: Display completion message
+      ansible.builtin.debug:
+        msg: "Initial setup completed successfully for {{ inventory_hostname }}"

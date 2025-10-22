@@ -1,0 +1,20 @@
+---
+# Default variables for initial_setup role
+timezone: "Europe/Bucharest"
+system_packages:
+  - curl
+  - wget
+  - git
+  - vim
+  - htop
+  - net-tools
+  - ufw
+  - fail2ban
+  - unattended-upgrades
+
+# Security settings
+enable_ufw: true
+allowed_ssh_port: 22
+
+# NTP settings
+enable_ntp: true

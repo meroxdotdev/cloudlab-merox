@@ -1,0 +1,12 @@
+---
+# Handlers for initial_setup role
+
+- name: restart cron
+  ansible.builtin.systemd:
+    name: cron
+    state: restarted
+
+- name: restart ssh
+  ansible.builtin.systemd:
+    name: ssh
+    state: restarted
