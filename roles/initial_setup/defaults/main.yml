@@ -1,6 +1,15 @@
 ---
-# Default variables for initial_setup role
+# System timezone
 timezone: "Europe/Bucharest"
+
+# NTP configuration
+enable_ntp: true
+
+# Firewall configuration
+enable_ufw: true
+allowed_ssh_port: 22
+
+# System packages to install
 system_packages:
   - curl
   - wget
@@ -9,12 +18,6 @@ system_packages:
   - htop
   - net-tools
   - ufw
-  - fail2ban
   - unattended-upgrades
-
-# Security settings
-enable_ufw: true
-allowed_ssh_port: 22
-
-# NTP settings
-enable_ntp: true
+  - software-properties-common
+  - ca-certificates
