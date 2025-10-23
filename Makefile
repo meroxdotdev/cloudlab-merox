@@ -1,16 +1,20 @@
-.PHONY: help install ping setup update check lint facts
+.PHONY: help install ping setup quick update check facts lint
 
 help:
 	@echo "Ansible VPS Management Commands"
 	@echo "================================"
 	@echo "install     - Install required collections"
 	@echo "ping        - Test connectivity"
-	@echo "setup       - Run full initial setup"
+	@echo "setup       - Full setup (OS + Docker + Tailscale)"
 	@echo "quick       - Quick recovery setup"
 	@echo "update      - Update all packages"
 	@echo "check       - Dry-run setup playbook"
 	@echo "facts       - Gather system facts"
 	@echo "lint        - Lint all playbooks"
+	@echo ""
+	@echo "Infrastructure:"
+	@echo "docker-setup  - Install Docker only"
+	@echo "docker-test   - Test Docker installation"
 
 install:
 	ansible-galaxy collection install -r requirements.yml
@@ -36,9 +40,12 @@ facts:
 lint:
 	@command -v ansible-lint >/dev/null 2>&1 && ansible-lint playbooks/*.yml || echo "ansible-lint not installed. Run: pip install ansible-lint"
 
-# Quick commands without vault (for testing)
-ping-no-vault:
-	ansible all -i "91.98.145.35," -m ping -u root -e ansible_python_interpreter=/usr/bin/python3
+# Infrastructure commands
+docker-setup:
+	ansible-playbook playbooks/docker-setup.yml --ask-vault-pass
+
+docker-test:
+	ansible vps_servers -m shell -a "docker ps && docker compose version" --ask-vault-pass
 
 # View encrypted files
 view-vault:

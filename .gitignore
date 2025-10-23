@@ -2,6 +2,11 @@
 .vault_pass*
 *.vault_pass
 
+# Ansible collections - downloaded via requirements.yml
+collections/
+ansible_collections/
+.ansible/
+
 # Logs - keep directory, ignore files
 logs/*.log
 logs/ansible_facts/
@@ -10,15 +15,28 @@ logs/ansible_facts/
 # Python
 __pycache__/
 *.py[cod]
+*.pyc
+.Python
+venv/
+env/
 
 # OS
 .DS_Store
+Thumbs.db
+*.swp
+*~
 
 # Backup
 *.bak
-*~
 
 # IDE
 .vscode/
 .idea/
-*.swp
+*.sublime-*
+
+# Ansible retry files
+*.retry
+
+# Temporary files
+.tmp/
+tmp/
