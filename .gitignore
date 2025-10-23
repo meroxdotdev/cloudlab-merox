@@ -1,24 +1,20 @@
-# Vault passwords
+# Vault passwords - NEVER COMMIT
 .vault_pass*
 *.vault_pass
 
-# Logs and cache
-logs/
-*.log
-/tmp/
-ansible_facts/
+# Logs - keep directory, ignore files
+logs/*.log
+logs/ansible_facts/
+!logs/.gitkeep
 
 # Python
 __pycache__/
 *.py[cod]
-*.so
-.Python
 
 # OS
 .DS_Store
-Thumbs.db
 
-# Backup files
+# Backup
 *.bak
 *~
 
