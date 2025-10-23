@@ -1,20 +1,25 @@
-.PHONY: help install ping setup quick update check facts lint
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test
 
 help:
 	@echo "Ansible VPS Management Commands"
 	@echo "================================"
-	@echo "install     - Install required collections"
-	@echo "ping        - Test connectivity"
-	@echo "setup       - Full setup (OS + Docker + Tailscale)"
-	@echo "quick       - Quick recovery setup"
-	@echo "update      - Update all packages"
-	@echo "check       - Dry-run setup playbook"
-	@echo "facts       - Gather system facts"
-	@echo "lint        - Lint all playbooks"
+	@echo "install       - Install required collections"
+	@echo "ping          - Test connectivity"
+	@echo "setup         - Full setup (OS + Docker + Tailscale + Traefik)"
+	@echo "quick         - Quick recovery setup"
+	@echo "update        - Update all packages"
+	@echo "check         - Dry-run setup playbook"
+	@echo "facts         - Gather system facts"
+	@echo "lint          - Lint all playbooks"
 	@echo ""
 	@echo "Infrastructure:"
 	@echo "docker-setup  - Install Docker only"
 	@echo "docker-test   - Test Docker installation"
+	@echo "traefik-setup - Deploy Traefik reverse proxy"
+	@echo "traefik-test  - Test Traefik deployment"
+	@echo ""
+	@echo "Utilities:"
+	@echo "view-vault    - View encrypted vault file"
 
 install:
 	ansible-galaxy collection install -r requirements.yml
@@ -46,6 +51,12 @@ docker-setup:
 
 docker-test:
 	ansible vps_servers -m shell -a "docker ps && docker compose version" --ask-vault-pass
+
+traefik-setup:
+	ansible-playbook playbooks/traefik-setup.yml --ask-vault-pass
+
+traefik-test:
+	ansible vps_servers -m shell -a "docker ps | grep traefik && docker logs traefik --tail 20" --ask-vault-pass
 
 # View encrypted files
 view-vault:

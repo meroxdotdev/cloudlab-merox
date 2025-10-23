@@ -3,30 +3,38 @@
   hosts: vps_servers
   become: yes
   gather_facts: yes
-  
+
   pre_tasks:
     - name: Display starting message
       ansible.builtin.debug:
         msg: "🚀 Starting complete setup for {{ inventory_hostname }}"
-  
+
   roles:
     - role: initial_setup
       tags: ['initial_setup', 'infra']
-    
+
     - role: docker_setup
       tags: ['docker', 'infra']
-    
+
     - role: tailscale_exit_node
       tags: ['tailscale', 'vpn']
-  
+
+    - role: pihole_prereqs
+      tags: ['pihole', 'dns', 'prereqs']
+
+    - role: traefik_setup
+      tags: ['traefik', 'proxy', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
         msg: "✅ Complete setup finished successfully for {{ inventory_hostname }}"
-    
+
     - name: Display installed versions
       ansible.builtin.debug:
-        msg: 
+        msg:
           - "System: {{ ansible_distribution }} {{ ansible_distribution_version }}"
           - "Docker: Installed ✓"
           - "Tailscale: Installed ✓"
+          - "Pi-hole Prerequisites: Configured ✓"
+          - "Traefik: Deployed ✓"
