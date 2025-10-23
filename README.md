@@ -42,6 +42,7 @@ After deployment:
 - **Traefik Dashboard**: `https://traefik.cloud.merox.dev`
 - **Pi-hole Admin**: `https://pihole.cloud.merox.dev/admin`
 - **Portainer**: `https://portainer.cloud.merox.dev` (set admin password on first login)
+- **getHomepage dashboard**: `https://homepage.cloud.merox.dev/admin`
 
 ## Vault Management
 ```bash
@@ -119,6 +120,7 @@ ansible-playbook playbooks/site.yml -l cloudlab1 --ask-vault-pass --check
 /srv/docker/traefik/data/acme.json      # SSL certificates
 /srv/docker/pihole/etc-pihole/          # Pi-hole config + custom DNS
 /srv/docker/portainer/data/             # Portainer settings
+/srv/docker/homepage/                   # getHomepage settings
 
 # Automated backup role (TODO):
 # - Backup to S3/Backblaze B2
