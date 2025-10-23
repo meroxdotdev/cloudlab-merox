@@ -1,5 +1,17 @@
+# Production VPS Servers
 [vps_servers]
-91.98.145.35
+vps01 ansible_host=46.224.19.196
+
+[vps_servers:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+# Optional: Add groups for different services
+[web_servers]
+vps01
+
+[exit_nodes]
+vps01
 
 [all:vars]
-ansible_python_interpreter=/usr/bin/python3
+# Global variables
+ansible_user=root

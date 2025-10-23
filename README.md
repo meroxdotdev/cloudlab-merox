@@ -1,124 +1,124 @@
-# CloudLab Merox - Ansible Infrastructure Automation
+# CloudLab Merox - Ansible VPS Management
 
-Professional Ansible project for managing VPS/cloud instances with initial setup and configuration.
+Modern Ansible setup pentru VPS-uri (2025 best practices).
+
+## Quick Start (Fresh Clone)
+```bash
+# 1. Prerequisites
+sudo apt install -y python3-pip git
+pip3 install ansible
+
+# 2. Clone & Setup
+git clone <repo-url> cloudlab-merox
+cd cloudlab-merox
+make install
+
+# 3. Test & Deploy
+make ping          # Test connection (asks vault password)
+make setup         # Full VPS setup
+```
+
+## Daily Commands
+```bash
+make ping          # Test connectivity
+make setup         # Full setup (new VPS or recovery)
+make quick         # Fast recovery
+make update        # Update packages only
+make check         # Dry-run (see changes without applying)
+make help          # Show all commands
+```
+
+## Vault Management
+```bash
+# View secrets
+ansible-vault view inventories/production/group_vars/all/vault.yml
+
+# Edit secrets
+ansible-vault edit inventories/production/group_vars/all/vault.yml
+
+# Create new encrypted file
+ansible-vault create path/to/secrets.yml
+```
+
+## Add New VPS
+```bash
+# 1. Edit inventory
+nano inventories/production/hosts
+# Add: vps02 ansible_host=YOUR_IP
+
+# 2. Deploy
+ansible-playbook playbooks/site.yml --limit vps02 --ask-vault-pass
+```
+
+## Advanced Usage
+```bash
+# Run specific tags
+ansible-playbook playbooks/site.yml --tags "firewall,security" --ask-vault-pass
+
+# Run on specific host
+ansible-playbook playbooks/site.yml --limit vps01 --ask-vault-pass
+
+# Verbose debug
+ansible-playbook playbooks/site.yml -vvv --ask-vault-pass
+
+# List tasks/tags
+ansible-playbook playbooks/site.yml --list-tasks
+ansible-playbook playbooks/site.yml --list-tags
+```
+
+## Troubleshooting
+```bash
+# Test SSH directly
+ssh root@91.98.145.35
+
+# Check inventory
+ansible-inventory --graph
+
+# Ping without vault
+ansible all -i "91.98.145.35," -m ping -u root
+
+# Syntax check
+ansible-playbook playbooks/site.yml --syntax-check
+```
 
 ## Project Structure
 ```
-cloudlab-merox/
-├── ansible.cfg              # Ansible configuration
-├── inventories/             # Inventory files
-│   └── production/
-│       ├── hosts           # Production inventory
-│       ├── group_vars/     # Group variables
-│       └── host_vars/      # Host-specific variables
-├── playbooks/              # Playbook files
-│   └── site.yml           # Main playbook
-├── roles/                  # Custom roles
-│   └── initial_setup/     # Initial VPS setup role
-├── files/                  # Static files
-├── templates/              # Jinja2 templates
-├── requirements.yml        # Ansible Galaxy requirements
-└── README.md              # This file
+inventories/production/
+  ├── hosts                    # Server IPs/hostnames
+  └── group_vars/
+      ├── all/vault.yml        # Encrypted secrets
+      └── vps_servers/vars.yml # VPS variables
+
+playbooks/
+  ├── site.yml                 # Main playbook
+  ├── quick-setup.yml          # Fast recovery
+  └── update.yml               # Updates only
+
+roles/
+  ├── initial_setup/           # System setup
+  └── tailscale_exit_node/     # Tailscale VPN
 ```
 
-## Features
+## Security Notes
 
-- ✅ Automatic OS detection (Debian/Ubuntu)
-- ✅ System updates and upgrades
-- ✅ Timezone configuration (Europe/Bucharest)
-- ✅ Essential packages installation
-- ✅ UFW firewall configuration
-- ✅ Fail2ban installation
-- ✅ Automatic security updates
-- ✅ NTP time synchronization
+- Always use `--ask-vault-pass` (no plaintext passwords on disk)
+- Never commit `.vault_pass*` files
+- Store vault password in password manager
+- Prefix vault variables: `vault_api_key`, `vault_secret`, etc.
 
-## Requirements
-
-- Ansible 2.16+ (with ansible-core 2.18+)
-- Python 3.11+
-- SSH access to target servers
-
-## Installation
-
-1. Clone this repository:
+## Quick Recovery (VPS Rebuild)
 ```bash
-git clone https://github.com/yourusername/cloudlab-merox.git
-cd cloudlab-merox
+# 1. Rebuild VPS via provider
+# 2. Update IP in inventories/production/hosts (if changed)
+# 3. Run: make quick
+# Done in ~5 minutes!
 ```
 
-2. Install required collections:
+---
+
+**Pro Tip**: Add to `~/.bashrc` for even faster commands:
 ```bash
-ansible-galaxy collection install -r requirements.yml
+alias ap='ansible-playbook'
+alias apv='ansible-playbook --ask-vault-pass'
+alias aping='ansible vps_servers -m ping --ask-vault-pass'
 ```
-
-3. Configure your inventory:
-```bash
-# Edit inventories/production/hosts
-nano inventories/production/hosts
-```
-
-## Usage
-
-### Run full initial setup:
-```bash
-ansible-playbook playbooks/site.yml
-```
-
-### Run specific tags:
-```bash
-# Only update packages
-ansible-playbook playbooks/site.yml --tags packages
-
-# Only configure timezone
-ansible-playbook playbooks/site.yml --tags timezone
-
-# Only setup firewall
-ansible-playbook playbooks/site.yml --tags firewall
-```
-
-### Dry run (check mode):
-```bash
-ansible-playbook playbooks/site.yml --check --diff
-```
-
-## Configuration
-
-### Timezone
-Default: `Europe/Bucharest`
-
-Change in `roles/initial_setup/defaults/main.yml`:
-```yaml
-timezone: "Your/Timezone"
-```
-
-### SSH Port
-Default: `22`
-
-Change in `roles/initial_setup/defaults/main.yml`:
-```yaml
-allowed_ssh_port: your_port_number
-```
-
-## Security
-
-- All sensitive data should be encrypted using Ansible Vault
-- Never commit passwords or API keys to the repository
-- Use SSH key authentication instead of passwords
-
-## Tags
-
-- `setup` - All setup tasks
-- `packages` - Package installation
-- `upgrade` - System upgrades
-- `timezone` - Timezone configuration
-- `firewall` - UFW firewall setup
-- `security` - Security configurations
-- `ntp` - NTP time synchronization
-
-## License
-
-MIT
-
-## Author
-
-Your Name

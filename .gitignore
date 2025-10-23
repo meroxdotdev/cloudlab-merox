@@ -1,36 +1,28 @@
-cat > .gitignore << 'EOF'
-# Ansible
-*.retry
-.vault_pass
-vault_password
-*.pyc
+# Vault passwords
+.vault_pass*
+*.vault_pass
+
+# Logs and cache
+logs/
+*.log
+/tmp/
+ansible_facts/
+
+# Python
 __pycache__/
-.ansible/
-
-# Facts cache
-/tmp/ansible_facts/
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+*.py[cod]
+*.so
+.Python
 
 # OS
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
+# Backup files
+*.bak
+*~
 
-# Secrets (never commit these!)
-*_vault.yml
-secrets.yml
-group_vars/*/vault*
-host_vars/*/vault*
-
-# Temporary files
-tmp/
-temp/
-EOF
+# IDE
+.vscode/
+.idea/
+*.swp
