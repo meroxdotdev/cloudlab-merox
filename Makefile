@@ -1,11 +1,11 @@
-.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test homepage-setup homepage-test
 
 help:
 	@echo "Ansible VPS Management Commands"
 	@echo "================================"
 	@echo "install          - Install required collections"
 	@echo "ping             - Test connectivity"
-	@echo "setup            - Full setup (OS + Docker + Tailscale + Traefik + Pi-hole + Portainer)"
+	@echo "setup            - Full setup (all services)"
 	@echo "quick            - Quick recovery setup"
 	@echo "update           - Update all packages"
 	@echo "check            - Dry-run setup playbook"
@@ -21,6 +21,8 @@ help:
 	@echo "pihole-test      - Test Pi-hole deployment"
 	@echo "portainer-setup  - Deploy Portainer container UI"
 	@echo "portainer-test   - Test Portainer deployment"
+	@echo "homepage-setup   - Deploy Homepage dashboard"
+	@echo "homepage-test    - Test Homepage deployment"
 	@echo ""
 	@echo "Utilities:"
 	@echo "view-vault       - View encrypted vault file"
@@ -73,6 +75,12 @@ portainer-setup:
 
 portainer-test:
 	ansible vps_servers -m shell -a "docker ps | grep portainer && curl -I http://localhost:9000" --ask-vault-pass
+
+homepage-setup:
+	ansible-playbook playbooks/homepage-setup.yml --ask-vault-pass
+
+homepage-test:
+	ansible vps_servers -m shell -a "docker ps | grep homepage && curl -I http://localhost:3000" --ask-vault-pass
 
 # View encrypted files
 view-vault:

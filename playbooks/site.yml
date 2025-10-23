@@ -28,6 +28,12 @@
     - role: pihole_setup
       tags: ['pihole', 'dns', 'services']
 
+    - role: portainer_setup
+      tags: ['portainer', 'management', 'services']
+
+    - role: homepage_setup
+      tags: ['homepage', 'dashboard', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
@@ -39,6 +45,7 @@
           - "System: {{ ansible_distribution }} {{ ansible_distribution_version }}"
           - "Docker: Installed ✓"
           - "Tailscale: Installed ✓"
-          - "Pi-hole Prerequisites: Configured ✓"
           - "Traefik: Deployed ✓"
           - "Pi-hole: Deployed ✓"
+          - "Portainer: Deployed ✓"
+          - "Homepage: Deployed ✓"
