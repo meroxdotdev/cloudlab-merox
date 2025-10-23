@@ -1,27 +1,29 @@
-.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test
 
 help:
 	@echo "Ansible VPS Management Commands"
 	@echo "================================"
-	@echo "install       - Install required collections"
-	@echo "ping          - Test connectivity"
-	@echo "setup         - Full setup (OS + Docker + Tailscale + Traefik + Pi-hole)"
-	@echo "quick         - Quick recovery setup"
-	@echo "update        - Update all packages"
-	@echo "check         - Dry-run setup playbook"
-	@echo "facts         - Gather system facts"
-	@echo "lint          - Lint all playbooks"
+	@echo "install          - Install required collections"
+	@echo "ping             - Test connectivity"
+	@echo "setup            - Full setup (OS + Docker + Tailscale + Traefik + Pi-hole + Portainer)"
+	@echo "quick            - Quick recovery setup"
+	@echo "update           - Update all packages"
+	@echo "check            - Dry-run setup playbook"
+	@echo "facts            - Gather system facts"
+	@echo "lint             - Lint all playbooks"
 	@echo ""
 	@echo "Infrastructure:"
-	@echo "docker-setup  - Install Docker only"
-	@echo "docker-test   - Test Docker installation"
-	@echo "traefik-setup - Deploy Traefik reverse proxy"
-	@echo "traefik-test  - Test Traefik deployment"
-	@echo "pihole-setup  - Deploy Pi-hole DNS server"
-	@echo "pihole-test   - Test Pi-hole deployment"
+	@echo "docker-setup     - Install Docker only"
+	@echo "docker-test      - Test Docker installation"
+	@echo "traefik-setup    - Deploy Traefik reverse proxy"
+	@echo "traefik-test     - Test Traefik deployment"
+	@echo "pihole-setup     - Deploy Pi-hole DNS server"
+	@echo "pihole-test      - Test Pi-hole deployment"
+	@echo "portainer-setup  - Deploy Portainer container UI"
+	@echo "portainer-test   - Test Portainer deployment"
 	@echo ""
 	@echo "Utilities:"
-	@echo "view-vault    - View encrypted vault file"
+	@echo "view-vault       - View encrypted vault file"
 
 install:
 	ansible-galaxy collection install -r requirements.yml
@@ -65,6 +67,12 @@ pihole-setup:
 
 pihole-test:
 	ansible vps_servers -m shell -a "docker ps | grep pihole && dig @localhost google.com +short" --ask-vault-pass
+
+portainer-setup:
+	ansible-playbook playbooks/portainer-setup.yml --ask-vault-pass
+
+portainer-test:
+	ansible vps_servers -m shell -a "docker ps | grep portainer && curl -I http://localhost:9000" --ask-vault-pass
 
 # View encrypted files
 view-vault:
