@@ -1,58 +1,54 @@
 ---
-# Tailscale exit node setup
+# Install and configure Tailscale as exit node
 
 - name: Install curl if not present
   ansible.builtin.apt:
     name: curl
     state: present
-  tags: ['tailscale', 'install']
+  tags: ['tailscale', 'setup']
 
-- name: Download Tailscale GPG key with curl
+- name: Download Tailscale GPG key
   ansible.builtin.shell: |
-    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/noble.noarmor.gpg -o /usr/share/keyrings/tailscale-archive-keyring.gpg
+    curl -fsSL https://pkgs.tailscale.com/stable/ubuntu/{{ ansible_distribution_release }}.noarmor.gpg -o /usr/share/keyrings/tailscale-archive-keyring.gpg
   args:
     creates: /usr/share/keyrings/tailscale-archive-keyring.gpg
-  tags: ['tailscale', 'install']
+  tags: ['tailscale', 'setup']
 
 - name: Add Tailscale repository
   ansible.builtin.apt_repository:
-    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu noble main"
+    repo: "deb [signed-by=/usr/share/keyrings/tailscale-archive-keyring.gpg] https://pkgs.tailscale.com/stable/ubuntu {{ ansible_distribution_release }} main"
     state: present
     filename: tailscale
-  tags: ['tailscale', 'install']
+  tags: ['tailscale', 'setup']
 
 - name: Update apt cache
   ansible.builtin.apt:
     update_cache: yes
-  tags: ['tailscale', 'install']
+  tags: ['tailscale', 'setup']
 
 - name: Install Tailscale
   ansible.builtin.apt:
     name: tailscale
     state: present
-  tags: ['tailscale', 'install']
+  tags: ['tailscale', 'setup']
 
 - name: Enable IPv4 forwarding
-  ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^#?net.ipv4.ip_forward'
-    line: 'net.ipv4.ip_forward=1'
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
     state: present
-  when: enable_ipv4_forwarding
-  notify: reload sysctl
+    reload: yes
   tags: ['tailscale', 'network']
 
 - name: Enable IPv6 forwarding
-  ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^#?net.ipv6.conf.all.forwarding'
-    line: 'net.ipv6.conf.all.forwarding=1'
+  ansible.posix.sysctl:
+    name: net.ipv6.conf.all.forwarding
+    value: '1'
     state: present
-  when: enable_ipv6_forwarding
-  notify: reload sysctl
+    reload: yes
   tags: ['tailscale', 'network']
 
-- name: Apply sysctl settings immediately
+- name: Apply sysctl settings
   ansible.builtin.command: sysctl -p
   changed_when: false
   tags: ['tailscale', 'network']
@@ -60,45 +56,28 @@
 - name: Check if Tailscale is already connected
   ansible.builtin.command: tailscale status
   register: tailscale_status
-  failed_when: false
   changed_when: false
+  failed_when: false
   tags: ['tailscale', 'config']
 
-- name: Authenticate Tailscale with exit node advertisement
+- name: Authenticate Tailscale as exit node
   ansible.builtin.command: >
-    tailscale up
-    --reset
+    tailscale up --reset
     --authkey={{ tailscale_auth_key }}
-    --advertise-exit-node
-    {% if accept_routes %}--accept-routes{% endif %}
-    {% if accept_dns %}--accept-dns{% endif %}
-    {% if tailscale_tags %}--advertise-tags={{ tailscale_tags }}{% endif %}
+    {% if tailscale_advertise_exit_node %}--advertise-exit-node{% endif %}
+    {% if tailscale_accept_routes %}--accept-routes{% endif %}
+    {% if tailscale_accept_dns %}--accept-dns{% endif %}
   when: "'Logged out' in tailscale_status.stdout or tailscale_status.rc != 0"
   tags: ['tailscale', 'config']
-#  no_log: true
 
-- name: Allow Tailscale through UFW
-  community.general.ufw:
-    rule: allow
-    interface: tailscale0
-    direction: in
-  tags: ['tailscale', 'firewall']
-
-
-- name: Enable Tailscale service
-  ansible.builtin.systemd:
-    name: tailscaled
-    enabled: yes
-    state: started
-  tags: ['tailscale', 'service']
-
-- name: Get Tailscale status
+- name: Verify Tailscale connection
   ansible.builtin.command: tailscale status
-  register: tailscale_final_status
+  register: final_status
   changed_when: false
   tags: ['tailscale', 'verify']
 
 - name: Display Tailscale status
   ansible.builtin.debug:
-    var: tailscale_final_status.stdout_lines
+    msg: "✅ Tailscale connected successfully"
+  when: final_status.rc == 0
   tags: ['tailscale', 'verify']
