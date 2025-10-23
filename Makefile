@@ -85,3 +85,9 @@ homepage-test:
 # View encrypted files
 view-vault:
 	ansible-vault view inventories/production/group_vars/all/vault.yml
+
+netdata-setup:
+	ansible-playbook playbooks/netdata-setup.yml --ask-vault-pass
+
+netdata-test:
+	ansible vps_servers -m shell -a "docker ps | grep netdata && curl -I http://localhost:19999" --ask-vault-pass

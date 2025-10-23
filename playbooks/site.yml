@@ -34,6 +34,9 @@
     - role: homepage_setup
       tags: ['homepage', 'dashboard', 'services']
 
+    - role: netdata_setup
+      tags: ['netdata', 'monitoring', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
@@ -49,3 +52,4 @@
           - "Pi-hole: Deployed ✓"
           - "Portainer: Deployed ✓"
           - "Homepage: Deployed ✓"
+          - "Netdata: Deployed ✓"
