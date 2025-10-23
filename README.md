@@ -1,124 +1,214 @@
-# CloudLab Merox - Ansible VPS Management
+# CloudLab Merox - Ansible Infrastructure Automation
 
-Modern Ansible setup pentru VPS-uri (2025 best practices).
+Production-ready Ansible setup for Ubuntu VPS management with Docker services stack.
 
-## Quick Start (Fresh Clone)
+## Stack Overview
+- **OS**: Ubuntu 24.04 LTS hardened setup
+- **Network**: Tailscale mesh VPN + exit node
+- **Proxy**: Traefik with automatic HTTPS (Cloudflare DNS)
+- **DNS**: Pi-hole ad-blocking DNS server
+- **Management**: Portainer container orchestration
+- **Deployment**: ~6 minutes for full stack
+
+## Quick Start
 ```bash
-# 1. Prerequisites
+# Prerequisites
 sudo apt install -y python3-pip git
 pip3 install ansible
 
-# 2. Clone & Setup
+# Clone & Setup
 git clone <repo-url> cloudlab-merox
 cd cloudlab-merox
 make install
 
-# 3. Test & Deploy
-make ping          # Test connection (asks vault password)
-make setup         # Full VPS setup
+# Deploy
+make ping          # Test connectivity
+make setup         # Full deployment (~6 min)
 ```
 
-## Daily Commands
+## Daily Operations
 ```bash
-make ping          # Test connectivity
-make setup         # Full setup (new VPS or recovery)
-make quick         # Fast recovery
-make update        # Update packages only
-make check         # Dry-run (see changes without applying)
-make help          # Show all commands
+make setup         # Full deployment (new/existing VPS)
+make update        # OS package updates only
+make check         # Dry-run changes preview
+make docker-test   # Verify Docker stack
+make traefik-test  # Check Traefik status
+make pihole-test   # Verify Pi-hole DNS
 ```
+
+## Service Access
+After deployment:
+- **Traefik Dashboard**: `https://traefik.cloud.merox.dev`
+- **Pi-hole Admin**: `https://pihole.cloud.merox.dev/admin`
+- **Portainer**: `https://portainer.cloud.merox.dev`
 
 ## Vault Management
 ```bash
-# View secrets
-ansible-vault view inventories/production/group_vars/all/vault.yml
-
-# Edit secrets
+# View/Edit secrets
+make view-vault
 ansible-vault edit inventories/production/group_vars/all/vault.yml
 
-# Create new encrypted file
-ansible-vault create path/to/secrets.yml
+# Required secrets:
+# - tailscale_auth_key
+# - cloudflare_api_token
+# - cloudflare_email
+# - traefik_dashboard_credentials (htpasswd format)
+# - pihole_webpassword
+# - portainer_admin_password
 ```
 
-## Add New VPS
+## Add New Server
 ```bash
 # 1. Edit inventory
 nano inventories/production/hosts
-# Add: vps02 ansible_host=YOUR_IP
+# Add: vps02 ansible_host=YOUR_IP ansible_user=root
 
-# 2. Deploy
-ansible-playbook playbooks/site.yml --limit vps02 --ask-vault-pass
-```
-
-## Advanced Usage
-```bash
-# Run specific tags
-ansible-playbook playbooks/site.yml --tags "firewall,security" --ask-vault-pass
-
-# Run on specific host
-ansible-playbook playbooks/site.yml --limit vps01 --ask-vault-pass
-
-# Verbose debug
-ansible-playbook playbooks/site.yml -vvv --ask-vault-pass
-
-# List tasks/tags
-ansible-playbook playbooks/site.yml --list-tasks
-ansible-playbook playbooks/site.yml --list-tags
-```
-
-## Troubleshooting
-```bash
-# Test SSH directly
-ssh root@91.98.145.35
-
-# Check inventory
-ansible-inventory --graph
-
-# Ping without vault
-ansible all -i "91.98.145.35," -m ping -u root
-
-# Syntax check
-ansible-playbook playbooks/site.yml --syntax-check
+# 2. Deploy to new host only
+ansible-playbook playbooks/site.yml -l vps02 --ask-vault-pass
 ```
 
 ## Project Structure
 ```
-inventories/production/
-  ├── hosts                    # Server IPs/hostnames
-  └── group_vars/
-      ├── all/vault.yml        # Encrypted secrets
-      └── vps_servers/vars.yml # VPS variables
-
-playbooks/
-  ├── site.yml                 # Main playbook
-  ├── quick-setup.yml          # Fast recovery
-  └── update.yml               # Updates only
-
-roles/
-  ├── initial_setup/           # System setup
-  └── tailscale_exit_node/     # Tailscale VPN
+cloudlab-merox/
+├── inventories/production/
+│   ├── hosts                           # Server inventory
+│   └── group_vars/all/vault.yml        # Encrypted secrets
+├── roles/
+│   ├── initial_setup/                  # OS hardening
+│   ├── docker_setup/                   # Docker installation
+│   ├── tailscale_exit_node/            # VPN mesh
+│   ├── pihole_prereqs/                 # DNS prerequisites
+│   ├── traefik_setup/                  # Reverse proxy
+│   ├── pihole_setup/                   # DNS server
+│   └── portainer_setup/                # Container UI
+└── playbooks/
+    ├── site.yml                        # Main playbook
+    ├── traefik-setup.yml               # Traefik only
+    └── pihole-setup.yml                # Pi-hole only
 ```
+
+## Long-term Maintenance
+
+### Monthly Tasks
+```bash
+# Update packages across all servers
+make update
+
+# Review and rotate secrets
+ansible-vault edit inventories/production/group_vars/all/vault.yml
+```
+
+### Quarterly Tasks
+```bash
+# Update Ansible collections
+make install
+
+# Review and update pinned versions in defaults/main.yml:
+# - traefik_image: "traefik:vX.Y"
+# - pihole_image: "pihole/pihole:vX.Y"
+# - portainer_image: "portainer/portainer-ce:X.Y.Z"
+
+# Test on staging/single host first
+ansible-playbook playbooks/site.yml -l cloudlab1 --ask-vault-pass --check
+```
+
+### Backup Strategy
+```bash
+# Critical paths to backup (per host):
+/srv/docker/traefik/data/acme.json      # SSL certificates
+/srv/docker/pihole/etc-pihole/          # Pi-hole config + custom DNS
+/srv/docker/portainer/data/             # Portainer settings
+
+# Automated backup role (TODO):
+# - Backup to S3/Backblaze B2
+# - Retention: 30 days
+```
+
+### Security Updates
+```bash
+# Emergency patch deployment
+ansible vps_servers -m apt -a "upgrade=dist update_cache=yes" --become --ask-vault-pass
+
+# Reboot if needed
+ansible vps_servers -m reboot --become --ask-vault-pass
+```
+
+### Monitoring Checklist
+- [ ] Traefik certificate renewals (auto, check logs)
+- [ ] Pi-hole upstream DNS responsiveness
+- [ ] Docker container health status
+- [ ] Tailscale connectivity across mesh
+- [ ] Disk space on `/srv/docker/` volumes
+
+### Version Pinning Philosophy
+- Pin major versions only (`traefik:v3` not `traefik:v3.2.1`)
+- Update quarterly with testing
+- Document breaking changes in `CHANGELOG.md`
+
+### Disaster Recovery
+```bash
+# VPS rebuild (same IP)
+make setup
+
+# VPS rebuild (new IP)
+# 1. Update inventories/production/hosts
+# 2. Update DNS A records for *.cloud.merox.dev
+# 3. make setup
+# 4. Restore backups to /srv/docker/
+```
+
+## Advanced Usage
+```bash
+# Run specific roles only
+ansible-playbook playbooks/site.yml --tags docker --ask-vault-pass
+
+# Skip specific roles
+ansible-playbook playbooks/site.yml --skip-tags tailscale --ask-vault-pass
+
+# Verbose debugging
+ansible-playbook playbooks/site.yml -vvv --ask-vault-pass
+
+# Dry-run with diff
+ansible-playbook playbooks/site.yml --check --diff --ask-vault-pass
+```
+
+## Troubleshooting
+
+**Port 53 conflict**
+```bash
+ansible vps_servers -m systemd -a "name=systemd-resolved state=stopped enabled=no" --become --ask-vault-pass
+```
+
+**Traefik certificate issues**
+```bash
+ansible vps_servers -m shell -a "docker logs traefik | grep -i error" --ask-vault-pass
+```
+
+**Pi-hole DNS not resolving**
+```bash
+# Check dnsmasq config is enabled
+ansible vps_servers -m shell -a "docker exec pihole cat /etc/pihole/pihole.toml | grep etc_dnsmasq_d" --ask-vault-pass
+```
+
+**Docker network conflicts**
+```bash
+ansible vps_servers -m shell -a "docker network prune -f" --become --ask-vault-pass
+```
+
+## Contributing
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/new-service`
+3. Test on single host: `ansible-playbook playbooks/site.yml -l cloudlab1 --check`
+4. Commit with conventional commits: `feat: add monitoring role`
+5. Submit PR with test results
 
 ## Security Notes
-
-- Always use `--ask-vault-pass` (no plaintext passwords on disk)
-- Never commit `.vault_pass*` files
-- Store vault password in password manager
-- Prefix vault variables: `vault_api_key`, `vault_secret`, etc.
-
-## Quick Recovery (VPS Rebuild)
-```bash
-# 1. Rebuild VPS via provider
-# 2. Update IP in inventories/production/hosts (if changed)
-# 3. Run: make quick
-# Done in ~5 minutes!
-```
+- Vault password: Store in password manager, never commit
+- Rotate secrets quarterly
+- Use SSH keys only (no password auth)
+- Fail2ban enabled by `initial_setup` role
+- UFW firewall: Allow 22, 53, 80, 443, Tailscale
 
 ---
 
-**Pro Tip**: Add to `~/.bashrc` for even faster commands:
-```bash
-alias ap='ansible-playbook'
-alias apv='ansible-playbook --ask-vault-pass'
-alias aping='ansible vps_servers -m ping --ask-vault-pass'
-```
+**Deployment Time**: 6 minutes | **Idempotent**: Yes | **Tested**: Ubuntu 24.04 LTS
