@@ -1,9 +1,21 @@
 ---
+- name: Check if systemd-resolved is active
+  systemd:
+    name: systemd-resolved
+  register: resolved_status
+  failed_when: false
+
 - name: Stop and disable systemd-resolved
   systemd:
     name: systemd-resolved
     state: stopped
     enabled: false
+  when: resolved_status.status.ActiveState == "active"
+
+- name: Remove immutable flag from /etc/resolv.conf
+  command: chattr -i /etc/resolv.conf
+  changed_when: false
+  failed_when: false
 
 - name: Remove existing /etc/resolv.conf
   file:

@@ -1,11 +1,11 @@
-.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test
 
 help:
 	@echo "Ansible VPS Management Commands"
 	@echo "================================"
 	@echo "install       - Install required collections"
 	@echo "ping          - Test connectivity"
-	@echo "setup         - Full setup (OS + Docker + Tailscale + Traefik)"
+	@echo "setup         - Full setup (OS + Docker + Tailscale + Traefik + Pi-hole)"
 	@echo "quick         - Quick recovery setup"
 	@echo "update        - Update all packages"
 	@echo "check         - Dry-run setup playbook"
@@ -17,6 +17,8 @@ help:
 	@echo "docker-test   - Test Docker installation"
 	@echo "traefik-setup - Deploy Traefik reverse proxy"
 	@echo "traefik-test  - Test Traefik deployment"
+	@echo "pihole-setup  - Deploy Pi-hole DNS server"
+	@echo "pihole-test   - Test Pi-hole deployment"
 	@echo ""
 	@echo "Utilities:"
 	@echo "view-vault    - View encrypted vault file"
@@ -57,6 +59,12 @@ traefik-setup:
 
 traefik-test:
 	ansible vps_servers -m shell -a "docker ps | grep traefik && docker logs traefik --tail 20" --ask-vault-pass
+
+pihole-setup:
+	ansible-playbook playbooks/pihole-setup.yml --ask-vault-pass
+
+pihole-test:
+	ansible vps_servers -m shell -a "docker ps | grep pihole && dig @localhost google.com +short" --ask-vault-pass
 
 # View encrypted files
 view-vault:

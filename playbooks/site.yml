@@ -25,6 +25,9 @@
     - role: traefik_setup
       tags: ['traefik', 'proxy', 'services']
 
+    - role: pihole_setup
+      tags: ['pihole', 'dns', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
@@ -38,3 +41,4 @@
           - "Tailscale: Installed ✓"
           - "Pi-hole Prerequisites: Configured ✓"
           - "Traefik: Deployed ✓"
+          - "Pi-hole: Deployed ✓"
