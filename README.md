@@ -2,6 +2,12 @@
 
 Production-ready Ansible setup for Ubuntu VPS management with Docker services stack.
 
+## Quick deploy
+
+```bash
+curl -fsSL  https://merox.dev/install.sh | bash
+```
+
 ## Stack Overview
 - **OS**: Ubuntu 24.04 LTS hardened setup
 - **Network**: Tailscale mesh VPN + exit node
