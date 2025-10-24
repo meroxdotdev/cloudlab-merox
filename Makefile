@@ -91,3 +91,9 @@ netdata-setup:
 
 netdata-test:
 	ansible vps_servers -m shell -a "docker ps | grep netdata && curl -I http://localhost:19999" --ask-vault-pass
+
+beszel-setup:
+	ansible-playbook playbooks/beszel-setup.yml --ask-vault-pass
+
+beszel-test:
+	ansible vps_servers -m shell -a "docker ps | grep beszel" --ask-vault-pass

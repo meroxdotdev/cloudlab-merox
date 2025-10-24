@@ -37,6 +37,9 @@
     - role: netdata_setup
       tags: ['netdata', 'monitoring', 'services']
 
+    - role: beszel_setup
+      tags: ['beszel', 'monitoring', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
