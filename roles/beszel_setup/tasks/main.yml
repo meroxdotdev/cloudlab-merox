@@ -31,7 +31,7 @@
 - name: Wait for Beszel to be ready
   wait_for:
     port: "{{ beszel_port }}"
-    host: localhost
+    host: "{{ beszel_container_ip }}"
     delay: 5
     timeout: 60
 
@@ -47,4 +47,5 @@
     msg:
       - "Beszel deployed successfully!"
       - "Web Interface: https://{{ beszel_domain }}"
+      - "Container IP: {{ beszel_container_ip }}"
       - "Lightweight server monitoring hub"
