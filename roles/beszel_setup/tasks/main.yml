@@ -16,19 +16,6 @@
     mode: '0755'
   become: yes
 
-- name: Remove existing data file if present
-  file:
-    path: "{{ beszel_docker_dir }}/data"
-    state: absent
-  become: yes
-
-- name: Create Beszel data directory
-  file:
-    path: "{{ beszel_docker_dir }}/data"
-    state: directory
-    mode: '0755'
-  become: yes
-
 - name: Deploy Beszel docker-compose.yml
   template:
     src: docker-compose.yml.j2
