@@ -40,6 +40,12 @@
     - role: beszel_setup
       tags: ['beszel', 'monitoring', 'services']
 
+    - role: dozzle_setup
+      tags: ['dozzle', 'logging', 'services']
+
+    - role: nextcloud_setup
+      tags: ['nextcloud', 'storage', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:
@@ -56,3 +62,6 @@
           - "Portainer: Deployed ✓"
           - "Homepage: Deployed ✓"
           - "Netdata: Deployed ✓"
+          - "Beszel: Deployed ✓"
+          - "Dozzle: Deployed ✓"
+          - "Nextcloud: Deployed ✓"

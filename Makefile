@@ -97,3 +97,15 @@ beszel-setup:
 
 beszel-test:
 	ansible vps_servers -m shell -a "docker ps | grep beszel" --ask-vault-pass
+
+dozzle-setup:
+	ansible-playbook playbooks/dozzle-setup.yml --ask-vault-pass
+
+dozzle-test:
+	ansible vps_servers -m shell -a "docker ps | grep dozzle" --ask-vault-pass
+
+nextcloud-setup:
+	ansible-playbook playbooks/nextcloud-setup.yml --ask-vault-pass
+
+nextcloud-test:
+	ansible vps_servers -m shell -a "docker ps | grep nextcloud" --ask-vault-pass
