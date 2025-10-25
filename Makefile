@@ -1,4 +1,4 @@
-.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test homepage-setup homepage-test
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test homepage-setup homepage-test cleanup check-resources health-check
 
 help:
 	@echo "Ansible VPS Management Commands"
@@ -23,6 +23,19 @@ help:
 	@echo "portainer-test   - Test Portainer deployment"
 	@echo "homepage-setup   - Deploy Homepage dashboard"
 	@echo "homepage-test    - Test Homepage deployment"
+	@echo "netdata-setup    - Deploy Netdata monitoring"
+	@echo "netdata-test     - Test Netdata deployment"
+	@echo "beszel-setup     - Deploy Beszel monitoring"
+	@echo "beszel-test      - Test Beszel deployment"
+	@echo "dozzle-setup     - Deploy Dozzle log viewer"
+	@echo "dozzle-test      - Test Dozzle deployment"
+	@echo "nextcloud-setup  - Deploy Nextcloud storage"
+	@echo "nextcloud-test   - Test Nextcloud deployment"
+	@echo ""
+	@echo "Maintenance:"
+	@echo "cleanup          - Remove unused Docker resources"
+	@echo "check-resources  - Display VPS resource usage"
+	@echo "health-check     - Post-deployment health check"
 	@echo ""
 	@echo "Utilities:"
 	@echo "view-vault       - View encrypted vault file"
@@ -82,10 +95,6 @@ homepage-setup:
 homepage-test:
 	ansible vps_servers -m shell -a "docker ps | grep homepage && curl -I http://localhost:3000" --ask-vault-pass
 
-# View encrypted files
-view-vault:
-	ansible-vault view inventories/production/group_vars/all/vault.yml
-
 netdata-setup:
 	ansible-playbook playbooks/netdata-setup.yml --ask-vault-pass
 
@@ -109,3 +118,17 @@ nextcloud-setup:
 
 nextcloud-test:
 	ansible vps_servers -m shell -a "docker ps | grep nextcloud" --ask-vault-pass
+
+# Maintenance commands
+cleanup:
+	ansible-playbook playbooks/cleanup.yml --ask-vault-pass
+
+check-resources:
+	ansible-playbook playbooks/check-resources.yml --ask-vault-pass
+
+health-check:
+	ansible-playbook playbooks/health-check.yml --ask-vault-pass
+
+# View encrypted files
+view-vault:
+	ansible-vault view inventories/production/group_vars/all/vault.yml
