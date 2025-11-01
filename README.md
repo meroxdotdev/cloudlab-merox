@@ -16,7 +16,8 @@ curl -fsSL https://merox.dev/install.sh | bash
 - **Dashboard**: Homepage unified dashboard
 - **Monitoring**: Netdata + Beszel real-time metrics
 - **Logging**: Dozzle real-time Docker logs
-- **Storage**: Nextcloud private cloud
+- **Storage**: Nextcloud private cloud + Garage S3-compatible object storage
+- **Remote Access**: Apache Guacamole clientless remote desktop
 - **Deployment**: ~8 minutes for full stack
 
 ## Quick Start
@@ -48,6 +49,8 @@ make netdata-test     # Check Netdata monitoring
 make beszel-test      # Check Beszel monitoring
 make dozzle-test      # Check Dozzle logs
 make nextcloud-test   # Check Nextcloud
+make garage-test      # Check Garage S3 storage
+make guacamole-test   # Check Guacamole remote desktop
 ```
 
 ## Service Access
@@ -60,6 +63,24 @@ After deployment:
 - **Beszel**: `https://beszel.cloud.merox.dev`
 - **Dozzle**: `https://dozzle.cloud.merox.dev`
 - **Nextcloud**: `https://nextcloud.cloud.merox.dev` (setup admin on first login)
+- **Garage WebUI**: `https://garage-ui.cloud.merox.dev`
+- **Guacamole**: `https://guacamole.cloud.merox.dev` (guacadmin/guacadmin - change immediately!)
+
+## Deployed Services
+
+| Service | Purpose | URL | Default Credentials |
+|---------|---------|-----|---------------------|
+| **Traefik** | Reverse proxy & SSL | traefik.cloud.merox.dev | Vault: `traefik_dashboard_credentials` |
+| **Pi-hole** | DNS ad-blocking | pihole.cloud.merox.dev | Vault: `pihole_webpassword` |
+| **Portainer** | Container management | portainer.cloud.merox.dev | Set on first login |
+| **Homepage** | Unified dashboard | homepage.cloud.merox.dev | No auth |
+| **Netdata** | Real-time monitoring | netdata.cloud.merox.dev | No auth |
+| **Beszel** | Lightweight monitoring | beszel.cloud.merox.dev | No auth |
+| **Dozzle** | Docker log viewer | dozzle.cloud.merox.dev | No auth |
+| **Nextcloud** | Private cloud storage | nextcloud.cloud.merox.dev | Set on first login |
+| **Garage S3** | Object storage (S3) | garage.cloud.merox.dev | Generated on deploy |
+| **Garage WebUI** | S3 management UI | garage-ui.cloud.merox.dev | No auth |
+| **Guacamole** | Remote desktop gateway | guacamole.cloud.merox.dev | guacadmin / guacadmin |
 
 ## Vault Management
 ```bash
@@ -74,6 +95,9 @@ ansible-vault edit inventories/production/group_vars/all/vault.yml
 # - traefik_dashboard_credentials (htpasswd format)
 # - pihole_webpassword
 # - vault_nextcloud_db_password
+# - guacamole_db_password
+# - garage_rpc_secret (generated with: openssl rand -hex 32)
+# - garage_admin_token (generated with: openssl rand -hex 32)
 ```
 
 ## Add New Server
@@ -104,9 +128,11 @@ cloudlab-merox/
 │   ├── netdata_setup/                  # System monitoring
 │   ├── beszel_setup/                   # Lightweight monitoring
 │   ├── dozzle_setup/                   # Log viewer
-│   └── nextcloud_setup/                # Cloud storage
+│   ├── nextcloud_setup/                # Cloud storage
+│   ├── garage_setup/                   # S3-compatible storage
+│   └── guacamole_setup/                # Remote desktop gateway
 └── playbooks/
-    ├── site.yml                        # Main playbook
+    ├── site.yml                        # Main playbook (all services)
     ├── traefik-setup.yml               # Traefik only
     ├── pihole-setup.yml                # Pi-hole only
     ├── portainer-setup.yml             # Portainer only
@@ -114,7 +140,77 @@ cloudlab-merox/
     ├── netdata-setup.yml               # Netdata only
     ├── beszel-setup.yml                # Beszel only
     ├── dozzle-setup.yml                # Dozzle only
-    └── nextcloud-setup.yml             # Nextcloud only
+    ├── nextcloud-setup.yml             # Nextcloud only
+    ├── garage-setup.yml                # Garage S3 only
+    └── guacamole-setup.yml             # Guacamole only
+```
+
+## Garage S3 Storage
+
+### What is Garage?
+Garage is a self-hosted, S3-compatible, distributed object storage service - perfect for:
+- **Kubernetes backups** (Longhorn, Velero)
+- **Application object storage** (file uploads, media assets)
+- **MinIO replacement** (after Docker image discontinuation)
+- **Restic/Duplicity backups**
+
+### Getting Garage Credentials
+After first deployment, retrieve S3 credentials:
+```bash
+# SSH to server
+ssh root@vps01
+
+# Get Garage S3 credentials
+docker exec garage /garage key info longhorn-key --show-secret
+```
+
+Output will show:
+```
+Key name: longhorn-key
+Key ID: GK31c2f218a2e44f485b94239e
+Secret key: 7d37d093435a41f80b7167b4eacdc28b...
+```
+
+**Save these to vault** for future reference:
+```bash
+ansible-vault edit inventories/production/group_vars/all/vault.yml
+```
+
+Add:
+```yaml
+# Garage S3 credentials (from: docker exec garage /garage key info longhorn-key --show-secret)
+garage_access_key_id: "GK31c2f218a2e44f485b94239e"
+garage_secret_access_key: "7d37d093435a41f80b7167b4eacdc28b..."
+```
+
+
+Configure Longhorn backup target:
+```yaml
+defaultSettings:
+  backupTarget: "s3://longhorn@us-east-1/"
+  backupTargetCredentialSecret: "garage-backup-secret"
+```
+
+
+### Garage Management
+```bash
+# Create new bucket
+docker exec garage /garage bucket create my-bucket
+
+# Create new access key
+docker exec garage /garage key create my-app-key
+
+# Grant permissions
+docker exec garage /garage bucket allow my-bucket --read --write --key my-app-key
+
+# View credentials
+docker exec garage /garage key info my-app-key --show-secret
+
+# List all buckets
+docker exec garage /garage bucket list
+
+# Check node status
+docker exec garage /garage status
 ```
 
 ## Long-term Maintenance
@@ -126,6 +222,9 @@ make update
 
 # Review and rotate secrets
 ansible-vault edit inventories/production/group_vars/all/vault.yml
+
+# Check Garage storage usage
+docker exec garage /garage stats
 ```
 
 ### Quarterly Tasks
@@ -138,6 +237,7 @@ make install
 # - pihole_image: "pihole/pihole:vX.Y"
 # - portainer_image: "portainer/portainer-ee:X.Y.Z"
 # - nextcloud_image: "nextcloud:latest"
+# - garage_image: "dxflrs/garage:vX.Y.Z"
 
 # Test on staging/single host first
 ansible-playbook playbooks/site.yml -l cloudlab1 --ask-vault-pass --check
@@ -151,15 +251,19 @@ ansible-playbook playbooks/site.yml -l cloudlab1 --ask-vault-pass --check
 /srv/docker/portainer/data/             # Portainer settings
 /srv/docker/homepage/config/            # Homepage dashboard config
 /srv/docker/nextcloud/data/             # Nextcloud user data
+/srv/docker/garage/meta/                # Garage metadata
+/srv/docker/garage/data/                # Garage S3 objects
+/srv/docker/guacamole/drive/            # Guacamole shared files
+/srv/docker/guacamole/record/           # Guacamole session recordings
 
 # Docker volumes to backup:
 # - nextcloud_data
 # - nextcloud_db_data
 # - beszel_data
+# - guacamole_db_data
 
-# Automated backup role (TODO):
-# - Backup to S3/Backblaze B2
-# - Retention: 30 days
+# Garage can backup itself to another S3!
+# Use Garage as backup target for other services
 ```
 
 ### Security Updates
@@ -180,6 +284,8 @@ ansible vps_servers -m reboot --become --ask-vault-pass
 - [ ] Netdata alerts configuration
 - [ ] Nextcloud cron jobs running
 - [ ] Dozzle log access
+- [ ] Garage storage capacity (`docker exec garage /garage stats`)
+- [ ] Guacamole session recordings cleanup
 
 ### Version Pinning Philosophy
 - Pin major versions only (`traefik:v3` not `traefik:v3.2.1`)
@@ -198,12 +304,14 @@ make setup
 # 4. Restore backups to /srv/docker/
 # 5. Set Portainer admin password in UI
 # 6. Setup Nextcloud admin account
+# 7. Change Guacamole default password (guacadmin/guacadmin)
+# 8. Garage credentials auto-restore from vault
 ```
 
 ## Advanced Usage
 ```bash
 # Run specific roles only
-ansible-playbook playbooks/site.yml --tags docker --ask-vault-pass
+ansible-playbook playbooks/site.yml --tags storage --ask-vault-pass
 
 # Skip specific roles
 ansible-playbook playbooks/site.yml --skip-tags tailscale --ask-vault-pass
@@ -213,6 +321,12 @@ ansible-playbook playbooks/site.yml -vvv --ask-vault-pass
 
 # Dry-run with diff
 ansible-playbook playbooks/site.yml --check --diff --ask-vault-pass
+
+# Deploy only Garage
+make garage-setup
+
+# Deploy only Guacamole
+make guacamole-setup
 ```
 
 ## Troubleshooting
@@ -246,10 +360,65 @@ ansible vps_servers -m shell -a "docker exec -u www-data nextcloud php occ maint
 ansible vps_servers -m shell -a "docker exec -u www-data nextcloud php occ db:add-missing-indices" --ask-vault-pass
 ```
 
+**Garage connection refused**
+```bash
+# Check Garage status
+ansible vps_servers -m shell -a "docker logs garage --tail 50" --ask-vault-pass
+ansible vps_servers -m shell -a "docker exec garage /garage status" --ask-vault-pass
+
+# Test S3 connectivity
+ansible vps_servers -m shell -a "curl -I http://localhost:3900" --ask-vault-pass
+```
+
+**Garage WebUI shows "Unknown Error"**
+```bash
+# Restart Garage stack
+ansible vps_servers -m shell -a "cd /srv/docker/garage && docker-compose restart" --ask-vault-pass
+
+# Check admin API
+ansible vps_servers -m shell -a "netstat -tlnp | grep 3903" --ask-vault-pass
+```
+
+**Guacamole database not initialized**
+```bash
+# Check if init script exists
+ansible vps_servers -m shell -a "ls -la /srv/docker/guacamole/init/" --ask-vault-pass
+
+# Regenerate if missing
+ansible vps_servers -m shell -a "docker run --rm guacamole/guacamole /opt/guacamole/bin/initdb.sh --postgresql > /srv/docker/guacamole/init/initdb.sql" --ask-vault-pass
+```
+
 **Docker network conflicts**
 ```bash
 ansible vps_servers -m shell -a "docker network prune -f" --become --ask-vault-pass
 ```
+
+## Use Cases
+
+### 🏠 Homelab
+- Complete self-hosted infrastructure
+- Ad-blocking DNS for entire network
+- Private cloud storage alternative to Google Drive/Dropbox
+- Remote desktop access from anywhere
+- S3 storage for backups and applications
+
+### 🎓 Learning Platform
+- Study Infrastructure as Code with Ansible
+- Learn Docker networking and reverse proxies
+- Practice GitOps workflows
+- Understand SSL/TLS certificate management
+
+### 💼 Small Business
+- Internal file sharing with Nextcloud
+- Remote access to workstations via Guacamole
+- Centralized log monitoring with Dozzle
+- S3-compatible storage for application backups
+
+### ☸️ Kubernetes Support
+- Garage S3 for Longhorn volume backups
+- Garage S3 for Velero cluster backups
+- Object storage for applications (MinIO replacement)
+- Reliable backup target with active maintenance
 
 ## Contributing
 1. Fork repository
@@ -266,7 +435,18 @@ ansible vps_servers -m shell -a "docker network prune -f" --become --ask-vault-p
 - UFW firewall: Allow 22, 53, 80, 443, Tailscale
 - Portainer: Set strong admin password on first login
 - Nextcloud: Enable 2FA for admin accounts
+- Guacamole: **Change default password immediately** (guacadmin/guacadmin)
+- Garage: Credentials generated once, save to vault
+
+## Resources
+
+- [Ansible Documentation](https://docs.ansible.com/)
+- [Traefik Documentation](https://doc.traefik.io/traefik/)
+- [Pi-hole Documentation](https://docs.pi-hole.net/)
+- [Garage Documentation](https://garagehq.deuxfleurs.fr/)
+- [Guacamole Documentation](https://guacamole.apache.org/doc/gug/)
+- [Nextcloud Documentation](https://docs.nextcloud.com/)
 
 ---
 
-**Deployment Time**: 8 minutes | **Idempotent**: Yes | **Tested**: Ubuntu 24.04 LTS
+**Deployment Time**: 8 minutes | **Idempotent**: Yes | **Tested**: Ubuntu 24.04 LTS | **Services**: 11 deployed automatically
