@@ -46,6 +46,9 @@
     - role: nextcloud_setup
       tags: ['nextcloud', 'storage', 'services']
 
+    - role: garage_setup
+      tags: ['garage', 'storage', 'services']
+
   post_tasks:
     - name: Display completion message
       ansible.builtin.debug:

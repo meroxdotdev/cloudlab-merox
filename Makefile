@@ -132,3 +132,9 @@ health-check:
 # View encrypted files
 view-vault:
 	ansible-vault view inventories/production/group_vars/all/vault.yml
+
+garage-setup:
+	ansible-playbook playbooks/garage-setup.yml --ask-vault-pass
+
+garage-test:
+	ansible vps_servers -m shell -a "docker ps | grep -E 'garage|garage-webui' && docker exec garage /garage status" --ask-vault-pass
