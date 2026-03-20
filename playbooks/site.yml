@@ -37,15 +37,6 @@
     - role: netdata_setup
       tags: ['netdata', 'monitoring', 'services']
 
-    - role: beszel_setup
-      tags: ['beszel', 'monitoring', 'services']
-
-    - role: dozzle_setup
-      tags: ['dozzle', 'logging', 'services']
-
-    - role: nextcloud_setup
-      tags: ['nextcloud', 'storage', 'services']
-
     - role: garage_setup
       tags: ['garage', 'storage', 'services']
 
@@ -65,6 +56,4 @@
           - "Portainer: Deployed ✓"
           - "Homepage: Deployed ✓"
           - "Netdata: Deployed ✓"
-          - "Beszel: Deployed ✓"
-          - "Dozzle: Deployed ✓"
-          - "Nextcloud: Deployed ✓"
+          - "Garage S3: Deployed ✓"

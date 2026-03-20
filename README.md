@@ -14,11 +14,9 @@ curl -fsSL https://merox.dev/install.sh | bash
 - **DNS**: Pi-hole ad-blocking DNS server
 - **Management**: Portainer container orchestration
 - **Dashboard**: Homepage unified dashboard
-- **Monitoring**: Netdata + Beszel real-time metrics
-- **Logging**: Dozzle real-time Docker logs
-- **Storage**: Nextcloud private cloud + Garage S3-compatible object storage
-- **Remote Access**: Apache Guacamole clientless remote desktop
-- **Deployment**: ~8 minutes for full stack
+- **Monitoring**: Netdata real-time metrics
+- **Storage**: Garage S3-compatible object storage (Longhorn backups)
+- **Deployment**: ~10 minutes for full stack
 
 ## Quick Start
 ```bash
@@ -41,16 +39,13 @@ make setup         # Full deployment (~8 min)
 make setup            # Full deployment (new/existing VPS)
 make update           # OS package updates only
 make check            # Dry-run changes preview
+make health-check     # Post-deploy verification
 make docker-test      # Verify Docker stack
 make traefik-test     # Check Traefik status
 make pihole-test      # Verify Pi-hole DNS
 make portainer-test   # Check Portainer status
 make netdata-test     # Check Netdata monitoring
-make beszel-test      # Check Beszel monitoring
-make dozzle-test      # Check Dozzle logs
-make nextcloud-test   # Check Nextcloud
 make garage-test      # Check Garage S3 storage
-make guacamole-test   # Check Guacamole remote desktop
 ```
 
 ## Service Access
@@ -60,11 +55,7 @@ After deployment:
 - **Pi-hole Admin**: `https://pihole.cloud.merox.dev/admin`
 - **Portainer**: `https://portainer.cloud.merox.dev` (set admin password on first login)
 - **Netdata**: `https://netdata.cloud.merox.dev`
-- **Beszel**: `https://beszel.cloud.merox.dev`
-- **Dozzle**: `https://dozzle.cloud.merox.dev`
-- **Nextcloud**: `https://nextcloud.cloud.merox.dev` (setup admin on first login)
 - **Garage WebUI**: `https://garage-ui.cloud.merox.dev`
-- **Guacamole**: `https://guacamole.cloud.merox.dev` (guacadmin/guacadmin - change immediately!)
 
 ## Deployed Services
 
@@ -75,12 +66,8 @@ After deployment:
 | **Portainer** | Container management | portainer.cloud.merox.dev | Set on first login |
 | **Homepage** | Unified dashboard | homepage.cloud.merox.dev | No auth |
 | **Netdata** | Real-time monitoring | netdata.cloud.merox.dev | No auth |
-| **Beszel** | Lightweight monitoring | beszel.cloud.merox.dev | No auth |
-| **Dozzle** | Docker log viewer | dozzle.cloud.merox.dev | No auth |
-| **Nextcloud** | Private cloud storage | nextcloud.cloud.merox.dev | Set on first login |
 | **Garage S3** | Object storage (S3) | garage.cloud.merox.dev | Generated on deploy |
 | **Garage WebUI** | S3 management UI | garage-ui.cloud.merox.dev | No auth |
-| **Guacamole** | Remote desktop gateway | guacamole.cloud.merox.dev | guacadmin / guacadmin |
 
 ## Vault Management
 ```bash
@@ -89,15 +76,15 @@ make view-vault
 ansible-vault edit inventories/production/group_vars/all/vault.yml
 
 # Required secrets:
-# - tailscale_auth_key
+# - tailscale_auth_key          (reusable key from Tailscale admin)
 # - cloudflare_api_token
 # - cloudflare_email
 # - traefik_dashboard_credentials (htpasswd format)
 # - pihole_webpassword
-# - vault_nextcloud_db_password
-# - guacamole_db_password
-# - garage_rpc_secret (generated with: openssl rand -hex 32)
-# - garage_admin_token (generated with: openssl rand -hex 32)
+# - garage_rpc_secret           (openssl rand -hex 32)
+# - garage_admin_token          (openssl rand -hex 32)
+# - garage_access_key_id        (retrieve after first deploy)
+# - garage_secret_access_key    (retrieve after first deploy)
 ```
 
 ## Add New Server
@@ -112,37 +99,29 @@ ansible-playbook playbooks/site.yml -l vps02 --ask-vault-pass
 
 ## Project Structure
 ```
-cloudlab-merox/
+cloudlab-infrastructure/
 ├── inventories/production/
-│   ├── hosts                           # Server inventory
-│   └── group_vars/all/vault.yml        # Encrypted secrets
+│   ├── hosts                           # Server inventory (update IP here on migration)
+│   └── group_vars/
+│       ├── all/vault.yml               # Encrypted secrets (ansible-vault)
+│       └── vps_servers/vars.yml        # Non-sensitive vars (timezone, packages)
 ├── roles/
-│   ├── initial_setup/                  # OS hardening
-│   ├── docker_setup/                   # Docker installation
-│   ├── tailscale_exit_node/            # VPN mesh
-│   ├── pihole_prereqs/                 # DNS prerequisites
-│   ├── traefik_setup/                  # Reverse proxy
-│   ├── pihole_setup/                   # DNS server
-│   ├── portainer_setup/                # Container UI
+│   ├── initial_setup/                  # OS hardening, UFW, NTP
+│   ├── docker_setup/                   # Docker CE installation
+│   ├── tailscale_exit_node/            # Tailscale VPN + exit node
+│   ├── pihole_prereqs/                 # Disable systemd-resolved (port 53)
+│   ├── traefik_setup/                  # Reverse proxy + Let's Encrypt ACME
+│   ├── pihole_setup/                   # Pi-hole DNS
+│   ├── portainer_setup/                # Portainer EE container UI
 │   ├── homepage_setup/                 # Unified dashboard
-│   ├── netdata_setup/                  # System monitoring
-│   ├── beszel_setup/                   # Lightweight monitoring
-│   ├── dozzle_setup/                   # Log viewer
-│   ├── nextcloud_setup/                # Cloud storage
-│   ├── garage_setup/                   # S3-compatible storage
-│   └── guacamole_setup/                # Remote desktop gateway
+│   ├── netdata_setup/                  # Real-time monitoring
+│   └── garage_setup/                   # Garage S3-compatible storage
 └── playbooks/
     ├── site.yml                        # Main playbook (all services)
-    ├── traefik-setup.yml               # Traefik only
-    ├── pihole-setup.yml                # Pi-hole only
-    ├── portainer-setup.yml             # Portainer only
-    ├── homepage-setup.yml              # Homepage only
-    ├── netdata-setup.yml               # Netdata only
-    ├── beszel-setup.yml                # Beszel only
-    ├── dozzle-setup.yml                # Dozzle only
-    ├── nextcloud-setup.yml             # Nextcloud only
-    ├── garage-setup.yml                # Garage S3 only
-    └── guacamole-setup.yml             # Guacamole only
+    ├── quick-setup.yml                 # Minimal recovery (OS + Tailscale only)
+    ├── health-check.yml                # Post-deploy verification
+    ├── update.yml                      # OS package updates
+    └── <service>-setup.yml             # Per-service playbooks
 ```
 
 ## Garage S3 Storage
