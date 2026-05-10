@@ -8,3 +8,5 @@ homepage_port: 3000
 homepage_puid: 1000
 homepage_pgid: 1000
 traefik_network_name: network-cloud-merox
+homepage_kubeconfig_enabled: false
+homepage_kubeconfig_path: "/srv/kubernetes/infrastructure/kubeconfig"

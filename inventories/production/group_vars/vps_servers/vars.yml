@@ -17,3 +17,10 @@ system_packages:
 
 # Reference vault variables
 tailscale_auth_key: "{{ vault_tailscale_auth_key }}"
+joplin_db_password: "{{ vault_joplin_db_password }}"
+garage_rpc_secret: "{{ vault_garage_rpc_secret }}"
+garage_admin_token: "{{ vault_garage_admin_token }}"
+
+# Homepage kubernetes integration (set to true if kubeconfig is present)
+homepage_kubeconfig_enabled: true
+homepage_kubeconfig_path: "/srv/kubernetes/infrastructure/kubeconfig"

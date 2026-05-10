@@ -1,44 +1,30 @@
-.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test homepage-setup homepage-test cleanup check-resources health-check
+.PHONY: help install ping setup quick update check facts lint traefik-setup traefik-test pihole-setup pihole-test portainer-setup portainer-test homepage-setup homepage-test cleanup check-resources health-check terraform-init terraform-plan terraform-apply terraform-destroy dr-full vault-add-joplin
 
 help:
-	@echo "Ansible VPS Management Commands"
-	@echo "================================"
-	@echo "install          - Install required collections"
-	@echo "ping             - Test connectivity"
-	@echo "setup            - Full setup (all services)"
-	@echo "quick            - Quick recovery setup"
-	@echo "update           - Update all packages"
-	@echo "check            - Dry-run setup playbook"
-	@echo "facts            - Gather system facts"
-	@echo "lint             - Lint all playbooks"
+	@echo "CloudLab VPS Management"
+	@echo "========================"
 	@echo ""
-	@echo "Infrastructure:"
-	@echo "docker-setup     - Install Docker only"
-	@echo "docker-test      - Test Docker installation"
-	@echo "traefik-setup    - Deploy Traefik reverse proxy"
-	@echo "traefik-test     - Test Traefik deployment"
-	@echo "pihole-setup     - Deploy Pi-hole DNS server"
-	@echo "pihole-test      - Test Pi-hole deployment"
-	@echo "portainer-setup  - Deploy Portainer container UI"
-	@echo "portainer-test   - Test Portainer deployment"
-	@echo "homepage-setup   - Deploy Homepage dashboard"
-	@echo "homepage-test    - Test Homepage deployment"
-	@echo "netdata-setup    - Deploy Netdata monitoring"
-	@echo "netdata-test     - Test Netdata deployment"
-	@echo "beszel-setup     - Deploy Beszel monitoring"
-	@echo "beszel-test      - Test Beszel deployment"
-	@echo "dozzle-setup     - Deploy Dozzle log viewer"
-	@echo "dozzle-test      - Test Dozzle deployment"
-	@echo "nextcloud-setup  - Deploy Nextcloud storage"
-	@echo "nextcloud-test   - Test Nextcloud deployment"
+	@echo "Disaster Recovery:"
+	@echo "  dr-full          - Provision Hetzner server + full Ansible deploy"
+	@echo "  terraform-apply  - Provision server on Hetzner only"
+	@echo "  terraform-plan   - Preview what Terraform will create"
+	@echo "  terraform-init   - Initialize Terraform (first time)"
 	@echo ""
-	@echo "Maintenance:"
-	@echo "cleanup          - Remove unused Docker resources"
-	@echo "check-resources  - Display VPS resource usage"
-	@echo "health-check     - Post-deployment health check"
+	@echo "Ansible:"
+	@echo "  setup            - Full deploy of all services"
+	@echo "  check            - Dry-run (no changes)"
+	@echo "  ping             - Test connectivity to server"
+	@echo "  update           - OS package updates only"
+	@echo "  health-check     - Post-deploy verification"
 	@echo ""
-	@echo "Utilities:"
-	@echo "view-vault       - View encrypted vault file"
+	@echo "Individual services:"
+	@echo "  traefik-setup    pihole-setup    portainer-setup"
+	@echo "  homepage-setup   garage-setup    joplin-setup"
+	@echo "  uptime-kuma-setup guacamole-setup glances-setup"
+	@echo ""
+	@echo "Vault:"
+	@echo "  view-vault       - View encrypted secrets"
+	@echo "  vault-add-joplin - Instructions to add Joplin DB password to vault"
 
 install:
 	ansible-galaxy collection install -r requirements.yml
@@ -138,3 +124,75 @@ garage-setup:
 
 garage-test:
 	ansible vps_servers -m shell -a "docker ps | grep -E 'garage|garage-webui' && docker exec garage /garage status" --ask-vault-pass
+
+joplin-setup:
+	ansible-playbook playbooks/site.yml --tags joplin --ask-vault-pass
+
+joplin-test:
+	ansible vps_servers -m shell -a "docker ps | grep -E 'joplin'" --ask-vault-pass
+
+uptime-kuma-setup:
+	ansible-playbook playbooks/site.yml --tags uptime-kuma --ask-vault-pass
+
+uptime-kuma-test:
+	ansible vps_servers -m shell -a "docker ps | grep uptime-kuma" --ask-vault-pass
+
+guacamole-setup:
+	ansible-playbook playbooks/site.yml --tags guacamole --ask-vault-pass
+
+guacamole-test:
+	ansible vps_servers -m shell -a "docker ps | grep guacamole" --ask-vault-pass
+
+glances-setup:
+	ansible-playbook playbooks/site.yml --tags glances --ask-vault-pass
+
+glances-test:
+	ansible vps_servers -m shell -a "docker ps | grep glances" --ask-vault-pass
+
+# Terraform — Disaster Recovery
+terraform-init:
+	cd terraform && terraform init
+
+terraform-plan:
+	cd terraform && terraform plan
+
+terraform-apply:
+	cd terraform && terraform apply -auto-approve
+	@NEW_IP=$$(cd terraform && terraform output -raw server_ip 2>/dev/null); \
+	if [ -n "$$NEW_IP" ]; then \
+		sed -i "s/ansible_host=.*/ansible_host=$$NEW_IP/" inventories/production/hosts; \
+		echo ""; \
+		echo "Server IP: $$NEW_IP — inventory updated automatically"; \
+		echo "Run: make setup  (after ~30s for cloud-init to finish)"; \
+	fi
+
+terraform-destroy:
+	@echo "WARNING: This will destroy the server. Press Ctrl+C to cancel."
+	@sleep 5
+	cd terraform && terraform destroy
+
+# Full Disaster Recovery — provision + configure everything
+dr-full:
+	@echo "Starting full disaster recovery on Hetzner..."
+	$(MAKE) terraform-apply
+	@echo "Waiting 45s for server boot + cloud-init..."
+	@sleep 45
+	$(MAKE) setup
+
+# Vault helpers
+vault-edit:
+	ansible-vault edit inventories/production/group_vars/all/vault.yml
+
+vault-show-required:
+	@echo "Required vault variables (get values from running server):"
+	@echo ""
+	@echo "  vault_tailscale_auth_key: '<from tailscale admin panel>'"
+	@echo "  vault_joplin_db_password: '<from running server docker-compose>'"
+	@echo "  vault_garage_rpc_secret:  '<docker exec garage cat /etc/garage.toml>'"
+	@echo "  vault_garage_admin_token: '<docker exec garage cat /etc/garage.toml>'"
+	@echo ""
+	@echo "Edit vault with: make vault-edit"
+
+vault-add-joplin:
+	@echo "Run: make vault-edit"
+	@echo "Add line: vault_joplin_db_password: '<your-db-password>'"

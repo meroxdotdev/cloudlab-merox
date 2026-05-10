@@ -1,4 +1,3 @@
-
 services:
   homepage:
     image: {{ homepage_image }}
@@ -17,10 +16,16 @@ services:
     volumes:
       - {{ homepage_docker_dir }}/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
+{% if homepage_kubeconfig_enabled %}
+      - {{ homepage_kubeconfig_path }}:/app/config/kubeconfig.yaml:ro
+{% endif %}
     environment:
       PUID: {{ homepage_puid }}
       PGID: {{ homepage_pgid }}
       HOMEPAGE_ALLOWED_HOSTS: "*"
+{% if homepage_kubeconfig_enabled %}
+      KUBECONFIG: /app/config/kubeconfig.yaml
+{% endif %}
     networks:
       {{ traefik_network_name }}:
         ipv4_address: {{ homepage_container_ip }}
