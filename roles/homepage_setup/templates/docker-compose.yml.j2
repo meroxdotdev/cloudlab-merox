@@ -12,17 +12,19 @@ services:
       - "pihole.cloud.merox.dev:{{ tailscale_ip }}"
       - "portainer.cloud.merox.dev:{{ tailscale_ip }}"
     ports:
-      - "{{ homepage_port }}:3000"
+      - "127.0.0.1:{{ homepage_port }}:3000"
     volumes:
       - {{ homepage_docker_dir }}/config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
 {% if homepage_kubeconfig_enabled %}
       - {{ homepage_kubeconfig_path }}:/app/config/kubeconfig.yaml:ro
 {% endif %}
+    env_file:
+      - homepage.env
     environment:
       PUID: {{ homepage_puid }}
       PGID: {{ homepage_pgid }}
-      HOMEPAGE_ALLOWED_HOSTS: "*"
+      HOMEPAGE_ALLOWED_HOSTS: "{{ homepage_allowed_hosts }}"
 {% if homepage_kubeconfig_enabled %}
       KUBECONFIG: /app/config/kubeconfig.yaml
 {% endif %}
@@ -34,6 +36,7 @@ services:
       - "traefik.http.routers.homepage.rule=Host(`{{ homepage_domain }}`)"
       - "traefik.http.routers.homepage.entrypoints=https"
       - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
+      - "traefik.http.routers.homepage.middlewares=default-headers@file"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
 networks:
