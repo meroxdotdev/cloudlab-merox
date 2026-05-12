@@ -9,17 +9,18 @@ services:
     extra_hosts:
       - "traefik.cloud.merox.dev:100.72.22.38"
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     volumes:
       - ./config:/app/config
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/kubeconfig.yaml:/app/config/kubeconfig.yaml:ro
+    env_file:
+      - homepage.env
     environment:
       PUID: 1000
       PGID: 1000
-      HOMEPAGE_ALLOWED_HOSTS: "*"
+      HOMEPAGE_ALLOWED_HOSTS: "inside.merox.dev,homepage.cloud.merox.dev"
       KUBECONFIG: /app/config/kubeconfig.yaml
-
     restart: unless-stopped
     networks:
       network-cloud-merox:
@@ -29,6 +30,7 @@ services:
       - "traefik.http.routers.homepage.rule=Host(`homepage.cloud.merox.dev`)"
       - "traefik.http.routers.homepage.entrypoints=https"
       - "traefik.http.routers.homepage.tls.certresolver=cloudflare"
+      - "traefik.http.routers.homepage.middlewares=default-headers@file"
       - "traefik.http.services.homepage.loadbalancer.server.port=3000"
 
   glances:
@@ -36,8 +38,6 @@ services:
     container_name: glances
     restart: unless-stopped
     pid: host
-    ports:
-      - "61208:61208"
     environment:
       GLANCES_OPT: "-w"
     volumes:
@@ -59,9 +59,13 @@ services:
     image: portainer/portainer-ee:latest
     container_name: portainer
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 100.72.22.38
     ports:
-      - "9000:9000"
-      - "9443:9443"
+      - "127.0.0.1:9000:9000"
+      - "127.0.0.1:9443:9443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
@@ -80,15 +84,19 @@ services:
     image: linuxserver/code-server:latest
     container_name: code-server
     restart: unless-stopped
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
     ports:
       - "8443:8443"
     environment:
-      PUID: 1000
-      PGID: 1000
+      PUID: 1001
+      PGID: 1001
       TZ: Europe/Bucharest
       PASSWORD: yourpassword
     volumes:
       - code_server_config:/config
+      - /srv:/srv 
     networks:
       network-cloud-merox:
         ipv4_address: 172.25.10.40
@@ -106,7 +114,7 @@ services:
     ports:
       - "53:53/tcp"
       - "53:53/udp"
-      - "8078:80/tcp"
+      - "127.0.0.1:8078:80"
     environment:
       TZ: 'Europe/Bucharest'
       FTLCONF_webserver_api_password: 'webpass12'
@@ -133,10 +141,54 @@ services:
       - "traefik.http.routers.pihole.tls.certresolver=cloudflare"
       - "traefik.http.services.pihole.loadbalancer.server.port=80"
 
+  # JOPLIN SERVER - NEW
+  joplin-db:
+    image: postgres:15
+    container_name: joplin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: AsuZ83hbw52vZz
+      POSTGRES_USER: joplin
+      POSTGRES_DB: joplin
+    volumes:
+      - joplin_db_data:/var/lib/postgresql/data
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.60
+
+  joplin-server:
+    image: joplin/server:latest
+    container_name: joplin-server
+    restart: unless-stopped
+    depends_on:
+      - joplin-db
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+    environment:
+      APP_PORT: 22300
+      APP_BASE_URL: https://joplin.cloud.merox.dev  
+      DB_CLIENT: pg
+      POSTGRES_PASSWORD: AsuZ83hbw52vZz
+      POSTGRES_DATABASE: joplin
+      POSTGRES_USER: joplin
+      POSTGRES_PORT: 5432
+      POSTGRES_HOST: joplin-db
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.61
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.joplin.rule=Host(`joplin.cloud.merox.dev`)"
+      - "traefik.http.routers.joplin.entrypoints=https"
+      - "traefik.http.routers.joplin.tls.certresolver=cloudflare"
+      - "traefik.http.services.joplin.loadbalancer.server.port=22300"
+      - "traefik.docker.network=network-cloud-merox"
+
 volumes:
   portainer_data:
   code_server_config:
-
+  joplin_db_data:
 
 networks:
   network-cloud-merox:
@@ -145,4 +197,4 @@ networks:
     ipam:
       config:
         - subnet: 172.25.0.0/16
-          gateway: 172.25.0.1 
+          gateway: 172.25.0.1

@@ -1,0 +1,29 @@
+services:
+  guacamole:
+    image: flcontainers/guacamole:latest
+    container_name: guacamole
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - guacamole_config:/config
+      - /etc/localtime:/etc/localtime:ro
+    environment:
+      TZ: "Europe/Bucharest"
+      EXTENSIONS: "auth-totp"
+    networks:
+      network-cloud-merox:
+        ipv4_address: 172.25.10.33
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guacamole.rule=Host(`ssh.cloud.merox.dev`)"
+      - "traefik.http.routers.guacamole.entrypoints=https"
+      - "traefik.http.routers.guacamole.tls.certresolver=cloudflare"
+      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+
+volumes:
+  guacamole_config:
+
+networks:
+  network-cloud-merox:
+    external: true

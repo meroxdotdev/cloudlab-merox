@@ -2,13 +2,27 @@ services:
   uptime-kuma:
     image: louislam/uptime-kuma:latest
     container_name: uptime-kuma
-    restart: always
+    restart: unless-stopped
+    dns:
+      - 10.57.57.111
+      - 100.72.22.38
     ports:
-      - "3001:3001" # Portul pe care va fi accesibil Uptime Kuma
+      - "127.0.0.1:3001:3001"
     volumes:
-      - /srv/docker/monitoring/uptime-kuma:/app/data # Montarea volumului pentru stocarea datelor pe host
+      - uptime_kuma_data:/app/data
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - vps_isolated
+      network-cloud-merox:
+        ipv4_address: 172.25.10.50
+
+volumes:
+  uptime_kuma_data:
+
 networks:
-  vps_isolated:
-    external: true
+  network-cloud-merox:
+    name: network-cloud-merox
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.25.0.0/16
+          gateway: 172.25.0.1
