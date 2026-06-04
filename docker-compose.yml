@@ -1,4 +1,5 @@
 services:
+  # Secrets are loaded from .env (gitignored) — copy from .env.example to get started
   homepage:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
@@ -93,7 +94,7 @@ services:
       PUID: 1001
       PGID: 1001
       TZ: Europe/Bucharest
-      PASSWORD: yourpassword
+      PASSWORD: ${CODE_SERVER_PASSWORD}
     volumes:
       - code_server_config:/config
       - /srv:/srv 
@@ -127,7 +128,7 @@ services:
       - "127.0.0.1:8078:80"
     environment:
       TZ: 'Europe/Bucharest'
-      FTLCONF_webserver_api_password: 'webpass12'
+      FTLCONF_webserver_api_password: '${PIHOLE_WEBPASSWORD}'
       FTLCONF_dns_upstreams: '172.25.10.52#5335'
       FTLCONF_dns_listeningMode: 'all'
       ServerIP: '100.72.22.38'
@@ -157,7 +158,7 @@ services:
     container_name: joplin-db
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: AsuZ83hbw52vZz
+      POSTGRES_PASSWORD: ${JOPLIN_POSTGRES_PASSWORD}
       POSTGRES_USER: joplin
       POSTGRES_DB: joplin
     volumes:
@@ -179,7 +180,7 @@ services:
       APP_PORT: 22300
       APP_BASE_URL: https://joplin.cloud.merox.dev  
       DB_CLIENT: pg
-      POSTGRES_PASSWORD: AsuZ83hbw52vZz
+      POSTGRES_PASSWORD: ${JOPLIN_POSTGRES_PASSWORD}
       POSTGRES_DATABASE: joplin
       POSTGRES_USER: joplin
       POSTGRES_PORT: 5432

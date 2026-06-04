@@ -1,6 +1,7 @@
 # Secrets și credențiale
 *.env
 .env*
+!.env.example
 *token*.txt
 *_token.txt
 *api*.txt
