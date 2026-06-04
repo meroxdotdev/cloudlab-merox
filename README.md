@@ -17,9 +17,9 @@ All services route through Cloudflare Tunnel — no open ports required.
 | Glances | glances.cloud.merox.dev | System monitoring |
 | Garage S3 | garage.cloud.merox.dev | S3-compatible object storage |
 | Authentik | sso.merox.dev | Identity provider (SSO) |
-| Netdata | netdata.cloud.merox.dev | Real-time performance monitoring |
-| Beszel | beszel.cloud.merox.dev | Host monitoring |
 | Dozzle | dozzle.cloud.merox.dev | Docker log aggregation |
+| Beszel *(optional)* | beszel.cloud.merox.dev | Host monitoring — `cd beszel && docker compose up -d` |
+| Netdata *(optional)* | netdata.cloud.merox.dev | Real-time metrics — `cd netdata && docker compose up -d` |
 | OpenClaw Dashboard | agents.cloud.merox.dev | AI agent command center |
 | Code Server | code.cloud.merox.dev | Browser-based VS Code |
 
@@ -43,7 +43,7 @@ sudo chown 1000:1000 ./config/kubeconfig.yaml
 ## Disaster recovery (automated, ~15 min)
 
 ```bash
-cd cloudlab-infrastructure
+cd /srv/kubernetes/infrastructure/vps
 make dr-full   # Terraform provision + Ansible full deploy
 make restore   # Restore Joplin/Authentik DB backups
 ```
@@ -61,7 +61,7 @@ make authentik-backup  # Manual DB backup
 
 Secrets are managed in two places:
 - `.env` (gitignored) — Pi-hole, Joplin DB, code-server passwords. Copy from `.env.example`.
-- `cloudlab-infrastructure/inventories/production/group_vars/all/vault.yml` (Ansible vault) — Cloudflare token, Tailscale key, Authentik, Garage.
+- `vps/inventories/production/group_vars/all/vault.yml` (Ansible vault) — Cloudflare token, Tailscale key, Authentik, Garage.
 
 ## Networking
 
