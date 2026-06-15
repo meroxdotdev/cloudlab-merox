@@ -1,101 +1,43 @@
 http:
- #region routers
   routers:
-    pve1:
+    jellyfin:
       entryPoints:
         - "https"
-      rule: "Host(`pve1.merox.dev`)"
+      rule: "Host(`media.merox.dev`)"
       middlewares:
         - default-headers
-        - https-redirectscheme
-      tls: {}
-      service: pve1
-#    cloud:
-#      entryPoints:
-#        - "https"
-#      rule: "Host(`cloud.merox.dev`)"
-#      middlewares:
-#        - middlewares-authentik@file
-#        - default-headers
-#      tls: {}
-#      service: cloud
-#    proxmox:
-#      entryPoints:
-#        - "https"
-#      rule: "Host(`proxmox.merox.dev`)"
-#      middlewares:
-#        - default-headers
-#        - https-redirectscheme
-#      tls: {}
-#      service: proxmox
-#    dns:
-#      entryPoints:
-#        - "https"
-#      rule: "Host(`dns.merox.dev`)"
-#      middlewares:
-#        - default-headers
-#        - https-redirectscheme
-#      tls: {}
-#      service: dns
-#    pdf:
-#      entryPoints:
-#        - "https"
-#      rule: "Host(`pdf.merox.dev`)"
-#      middlewares:
-#        - default-headers
-#        - https-redirectscheme
-#      tls: {}
-#      service: pdf
+        - rate-limit-media
+      tls:
+        certResolver: cloudflare
+      service: jellyfin
 
+    guacamole:
+      entryPoints:
+        - "https"
+      rule: "Host(`rmt.merox.dev`)"
+      middlewares:
+        - middlewares-authentik
+        - default-headers
+      tls:
+        certResolver: cloudflare
+      service: guacamole
 
-
-#    testava:
-#      entryPoints:
-#        - "https"
-#      rule: "Host(`testava.merox.dev`)"
-#      middlewares:
-#        - default-headers
-#        - https-redirectscheme
-#      tls: {}
-#      service: testava
-
-
-
-#endregion
-#region services
   services:
-    pve1:
+    jellyfin:
       loadBalancer:
         servers:
-          - url: "https://10.57.57.251:8006"
+          - url: "http://10.57.57.80:30096"
+          - url: "http://10.57.57.82:30096"
+          - url: "http://10.57.57.84:30096"
         passHostHeader: true
-#    proxmox:
-#      loadBalancer:
-#        servers:
-#          - url: "https://10.57.57.251:8006"
-#       passHostHeader: true
-#    dns:
-#      loadBalancer:
-#        servers:
-#          - url: "http://192.168.57.2:3007"
-#        passHostHeader: true
-#    pdf:
-#      loadBalancer:
-#        servers:
-#          - url: "http://192.168.57.2:8057"
-#        passHostHeader: true
 
+    guacamole:
+      loadBalancer:
+        servers:
+          - url: "http://172.25.10.33:8080"
+        passHostHeader: true
 
-
-#    testava:
-#      loadBalancer:
-#        servers:
-#          - url: "http://192.168.57.2:8080"
-#        passHostHeader: true
-
-#endregion
   middlewares:
-
     https-redirectscheme:
       redirectScheme:
         scheme: https
@@ -118,7 +60,6 @@ http:
           - X-authentik-meta-app
           - X-authentik-meta-version
 
-
     default-headers:
       headers:
         frameDeny: true
@@ -138,6 +79,17 @@ http:
         - "10.0.0.0/8"
         - "192.168.0.0/16"
         - "172.16.0.0/12"
+
+    # Rate limiting pentru servicii media — max 200 req/s per IP, burst 100
+    # Protejează împotriva bandwidth abuse (singurul risc real de cost OCI)
+    rate-limit-media:
+      rateLimit:
+        average: 200
+        burst: 100
+        period: 1s
+        sourceCriterion:
+          ipStrategy:
+            depth: 1
 
     secured:
       chain:

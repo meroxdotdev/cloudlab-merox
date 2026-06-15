@@ -3,12 +3,23 @@
 # TAB: CLOUD
 # ============================================================================
 
+# Security & Access + Cloud Infrastructure + Productivity → un singur rând
 - Cloud Services:
 
-    - Portainer:
-        icon: portainer.png
-        href: https://one.merox.dev
-        description: Container Management
+    - Authentik:
+        icon: authentik.png
+        href: https://sso.merox.dev
+        description: Identity Provider
+
+    - Tailscale:
+        icon: tailscale.png
+        href: https://login.tailscale.com/admin/machines
+        description: Mesh VPN
+
+    - Guacamole:
+        icon: guacamole.png
+        href: https://rmt.merox.dev
+        description: Remote Desktop
 
     - Cloudflare Tunnel:
         icon: cloudflare.png
@@ -21,34 +32,10 @@
           key: "{{HOMEPAGE_VAR_CLOUDFLARE_KEY}}"
           fields: ["status"]
 
-    - Tailscale:
-        icon: tailscale.png
-        href: https://login.tailscale.com/admin/machines
-        description: Mesh VPN
-
-    - PiHole:
-        icon: sh-pi-hole
-        href: http://pihole.cloud.merox.dev/admin/login
-        description: DNS & Ad Blocking
-        widget:
-          type: pihole
-          url: https://172.25.10.53
-          version: 6
-          key: "{{HOMEPAGE_VAR_PIHOLE_KEY}}"
-
-    - Netdata:
-        icon: netdata.png
-        href: https://netdata.cloud.merox.dev
-        description: Performance Analytics
-
-    - Uptime Kuma:
-        icon: uptime-kuma.png
-        href: https://status.merox.dev
-        description: Uptime Monitoring
-        widget:
-          type: uptimekuma
-          url: http://uptime-kuma:3001
-          slug: infrastructure
+    - Portainer:
+        icon: portainer.png
+        href: https://one.merox.dev
+        description: Containers
 
     - Traefik:
         icon: traefik.png
@@ -58,29 +45,25 @@
     - GarageHQ:
         icon: garage.png
         href: http://garage.cloud.merox.dev
-        description: S3 Object Storage
+        description: S3 Storage
 
     - Joplin:
         icon: joplin.png
         href: http://joplin.cloud.merox.dev
-        description: Note Taking
+        description: Notes
 
     - VS Code:
         icon: vscode.png
         href: http://code.cloud.merox.dev
         description: Cloud IDE
 
+    - Agents Dashboard:
+        icon: mdi-robot
+        href: https://agents.cloud.merox.dev
+        description: AI Agent Command Center
+
 
 - System Monitoring:
-
-    - System:
-        icon: mdi-chip
-        description: Hardware & OS
-        widget:
-          type: glances
-          url: http://172.25.10.20:61208
-          version: 4
-          metric: info
 
     - CPU:
         icon: mdi-cpu-64-bit
@@ -118,29 +101,27 @@
           version: 4
           metric: disk:sda
 
-    - Processes:
-        icon: mdi-application-cog
-        description: Active Processes
+    - Netdata:
+        icon: netdata.png
+        href: https://netdata.cloud.merox.dev
+        description: Performance Analytics
+
+    - Uptime Kuma:
+        icon: uptime-kuma.png
+        href: https://status.merox.dev
+        description: Uptime Monitoring
         widget:
-          type: glances
-          url: http://172.25.10.20:61208
-          version: 4
-          metric: process
+          type: uptimekuma
+          url: http://uptime-kuma:3001
+          slug: infrastructure
 
 
 # ============================================================================
 # TAB: ON-PREM
 # ============================================================================
 
-- Network:
-
-    - Speedtest:
-        icon: https://camo.githubusercontent.com/4ccc83cf6b1f06e999c378bda264433ec83994031c156a5c88876b53eb57b201/68747470733a2f2f692e696d6775722e636f6d2f61436d413672482e706e67
-        href: http://speedtest.merox.dev
-        description: Speed Testing
-        widget:
-          type: myspeed
-          url: http://10.57.57.62:5216
+# Network + Infrastructure → un singur rând
+- Network & Infrastructure:
 
     - pfSense:
         icon: pfsense.png
@@ -158,18 +139,28 @@
           version: 2
           fields: ["load", "memory", "temp", "wanStatus"]
 
+    - PiHole:
+        icon: sh-pi-hole
+        href: http://pihole.cloud.merox.dev/admin/login
+        description: DNS Resolver
+
     - TP-Link WiFi:
         icon: mdi-wifi
         href: http://tplink.merox.dev
-        description: WiFi Management
+        description: WiFi
 
-
-- Infrastructure:
+    - Speedtest:
+        icon: https://camo.githubusercontent.com/4ccc83cf6b1f06e999c378bda264433ec83994031c156a5c88876b53eb57b201/68747470733a2f2f692e696d6775722e636f6d2f61436d413672482e706e67
+        href: http://speedtest.merox.dev
+        description: Speed Testing
+        widget:
+          type: myspeed
+          url: http://10.57.57.62:5216
 
     - Proxmox VE:
         icon: proxmox.png
         href: https://one.cloud.merox.dev
-        description: Virtualization Platform
+        description: Virtualization
         ping: 10.57.57.254
         widget:
           type: proxmox
@@ -191,7 +182,7 @@
     - iDRAC:
         icon: mdi-server
         href: https://idrac.merox.dev
-        description: Dell Server Management
+        description: Dell iDRAC
         ping: 10.57.57.249
 
 
@@ -210,22 +201,17 @@
     - Grafana:
         icon: grafana.png
         href: http://grafana.k8s.merox.dev
-        description: Metrics Visualization
+        description: Metrics
 
     - Prometheus:
         icon: prometheus.png
         href: http://prometheus.k8s.merox.dev
-        description: Monitoring & Alerting
+        description: Monitoring
 
     - Alertmanager:
         icon: mdi-bell-alert
         href: http://alertmanager.k8s.merox.dev
-        description: Alert Distribution
-
-    - n8n:
-        icon: n8n.png
-        href: https://n8n.k8s.merox.dev
-        description: Workflow Automation
+        description: Alerts
 
 
 # ============================================================================
@@ -261,7 +247,7 @@
     - qBittorrent:
         icon: qbittorrent.png
         href: https://qbittorrent.k8s.merox.dev
-        description: Download Client
+        description: Downloads
         widget:
           type: qbittorrent
           url: http://10.57.57.80:30080
@@ -271,14 +257,14 @@
     - Radarr:
         icon: radarr.png
         href: https://radarr.k8s.merox.dev
-        description: Movie Manager
+        description: Movies
 
     - Sonarr:
         icon: sonarr.png
         href: https://sonarr.k8s.merox.dev
-        description: TV Series Manager
+        description: TV Series
 
     - Prowlarr:
         icon: prowlarr.png
         href: https://prowlarr.k8s.merox.dev
-        description: Indexer Aggregator
+        description: Indexers

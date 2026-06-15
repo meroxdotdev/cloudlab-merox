@@ -10,6 +10,10 @@ services:
       - SYS_ADMIN
     security_opt:
       - apparmor:unconfined
+    dns:
+      - 1.1.1.1
+      - 8.8.8.8
+      - 100.72.22.38
     ports:
       - "19999:19999"
     volumes:

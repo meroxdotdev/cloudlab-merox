@@ -1,48 +1,36 @@
 ---
-# Merox Infrastructure Dashboard - Settings Configuration
-# Optimized for multi-tab layout with comprehensive monitoring
-
-# ============================================================================
-# PAGE IDENTITY
-# ============================================================================
 title: Inside Merox Infrastructure
 description: Unified Cloud, On-Premises & Media Infrastructure Management
 startUrl: https://inside.merox.dev
 
-# ============================================================================
-# VISUAL THEME
-# ============================================================================
 theme: dark
 color: gray
-iconStyle: theme
+iconStyle: flat
 
-
-# Background - Modern dark tech aesthetic
 background:
   image: https://merox.dev/assets/homelab.webp
   blur: xs
   saturate: 60
   brightness: 75
   opacity: 25
-cardBlur: xl
+cardBlur: none
 
-# Favicon
 favicon: https://merox.dev/assets/img/favicons/favicon-32x32.png
 
 # ============================================================================
-# LAYOUT CONFIGURATION
+# LAYOUT — 3 tabs: Cloud | On-Prem | Media
 # ============================================================================
 layout:
-  # -------------------------------------------------------------------------
-  # TAB 1: CLOUD - Cloud Services & Monitoring
-  # -------------------------------------------------------------------------
-  Cloud Infrastructure:
+
+  # ── Tab: Cloud ──────────────────────────────────────────────────
+  # ── Tab: Cloud ──────────────────────────────────────────────────
+  Cloud Services:
     tab: Cloud
     style: row
-    columns: 4
+    columns: 9
     icon: mdi-cloud-outline
     useEqualHeights: true
-    
+
   System Monitoring:
     tab: Cloud
     style: row
@@ -50,65 +38,41 @@ layout:
     icon: mdi-monitor-dashboard
     useEqualHeights: true
 
-  # -------------------------------------------------------------------------
-  # TAB 2: ON-PREM - On-Premises Infrastructure
-  # -------------------------------------------------------------------------
-  Network Infrastructure:
+  # ── Tab: On-Prem ─────────────────────────────────────────────────
+  Network & Infrastructure:
     tab: On-Prem
     style: row
-    columns: 3
-    icon: mdi-network
+    columns: 7
+    icon: mdi-server-network
     useEqualHeights: true
-    
-  Core Infrastructure:
-    tab: On-Prem
-    style: row
-    columns: 3
-    icon: mdi-server
-    useEqualHeights: true
-      
-  Kubernetes Ecosystem:
+
+  Kubernetes:
     tab: On-Prem
     style: row
     columns: 5
     icon: kubernetes.png
     useEqualHeights: true
 
-  # -------------------------------------------------------------------------
-  # TAB 3: MEDIA - Content Management & Streaming
-  # -------------------------------------------------------------------------
-  Media Services:
+  # ── Tab: Media ───────────────────────────────────────────────────
+  Media:
     tab: Media
     style: row
-    columns: 3
+    columns: 6
     icon: mdi-filmstrip
-    useEqualHeights: true
-    
-  Media Management:
-    tab: Media
-    style: row
-    columns: 4
-    icon: mdi-cog-outline
     useEqualHeights: true
 
 # ============================================================================
-# DISPLAY OPTIONS
+# DISPLAY
 # ============================================================================
 fullWidth: true
-maxGroupColumns: 6
+maxGroupColumns: 10
 maxBookmarkGroupColumns: 6
 disableCollapse: false
 groupsInitiallyCollapsed: false
 useEqualHeights: true
 
-# ============================================================================
-# HEADER STYLE
-# ============================================================================
 headerStyle: boxedWidgets
 
-# ============================================================================
-# QUICK LAUNCH
-# ============================================================================
 quicklaunch:
   searchDescriptions: true
   hideInternetSearch: false
@@ -117,41 +81,29 @@ quicklaunch:
   provider: duckduckgo
   mobileButtonPosition: bottom-right
 
-# ============================================================================
-# DOCKER & KUBERNETES
-# ============================================================================
 showStats: true
 statusStyle: dot
 
-# ============================================================================
-# SYSTEM
-# ============================================================================
 hideVersion: false
 disableUpdateCheck: false
 language: en
 target: _blank
 hideErrors: false
 
-# Instance identification for multi-homepage deployments
 instanceName: merox-main
 
 # ============================================================================
 # API PROVIDERS
 # ============================================================================
 providers:
-
-  
-  # Portainer API
   portainer:
     url: https://172.25.10.30:9443
-    key: 
-    
-  # Add more providers as needed:
-  proxmox:
-     url: https://10.57.57.254:8006
-     username: api@pam!gethomepage
-     password: 
+    key: "{{HOMEPAGE_VAR_PORTAINER_KEY}}"
 
+  proxmox:
+    url: https://10.57.57.254:8006
+    username: "{{HOMEPAGE_VAR_PROXMOX_USER}}"
+    password: "{{HOMEPAGE_VAR_PROXMOX_PASS}}"
 
   longhorn:
-    url: http://10.57.57.80:30887/  # SAU http://longhorn-frontend.longhorn-system
+    url: http://10.57.57.80:30887/

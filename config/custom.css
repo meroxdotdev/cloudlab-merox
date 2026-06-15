@@ -1,0 +1,226 @@
+/*
+ * inside.merox.dev — Grid Theme
+ * Multi-column, fiecare grup = 1 rând curat
+ * Palette din /srv/merox/src/styles/global.css
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  --e-bg:        #0D1017;
+  --e-surface:   #1c2233;
+  --e-surface-h: #222840;
+  --e-fg:        #F0F2F5;
+  --e-teal:      oklch(0.82 0.07 196);
+  --e-muted:     #9ca3af;
+  --e-border:    rgba(255, 255, 255, 0.07);
+  --e-border-h:  rgba(255, 255, 255, 0.13);
+  --e-amber:     hsl(38 92% 60%);
+  --e-ease:      cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --e-font:      'Geist', system-ui, -apple-system, sans-serif;
+  --e-mono:      'JetBrains Mono', 'Geist Mono', ui-monospace, monospace;
+  --e-radius:    8px;
+}
+
+/* ── Font ── */
+#page-wrapper,
+#page-wrapper * {
+  font-family:             var(--e-font) !important;
+  -webkit-font-smoothing:  antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* ═══════════════════════════════════════
+   SERVICE CARDS
+   ═══════════════════════════════════════ */
+.service-card {
+  background:    var(--e-surface) !important;
+  border:        1px solid var(--e-border) !important;
+  border-top:    2px solid transparent !important;
+  border-radius: var(--e-radius) !important;
+  box-shadow:    none !important;
+  transition:
+    background     0.15s var(--e-ease),
+    border-color   0.15s var(--e-ease),
+    border-top-color 0.15s var(--e-ease) !important;
+}
+
+.service-card:hover {
+  background:        var(--e-surface-h) !important;
+  border-color:      var(--e-border-h) !important;
+  border-top-color:  var(--e-teal) !important;
+  box-shadow:        none !important;
+  transform:         none !important;
+}
+
+/* Nume serviciu */
+.service-name {
+  color:       var(--e-fg) !important;
+  font-size:   0.875rem !important;
+  font-weight: 500 !important;
+}
+
+/* Descriere */
+.service-description {
+  color:       var(--e-muted) !important;
+  font-family: var(--e-mono) !important;
+  font-size:   0.72rem !important;
+  font-weight: 400 !important;
+  opacity:     1 !important;
+}
+
+/* ═══════════════════════════════════════
+   GROUP HEADERS
+   ═══════════════════════════════════════ */
+.service-group-name {
+  font-family:    var(--e-mono) !important;
+  font-size:      0.68rem !important;
+  font-weight:    700 !important;
+  letter-spacing: 0.15em !important;
+  text-transform: uppercase !important;
+  color:          var(--e-muted) !important;
+  display:        flex !important;
+  align-items:    center !important;
+  gap:            12px !important;
+  width:          100% !important;
+}
+
+.service-group-name::after {
+  content:    "" !important;
+  display:    block !important;
+  flex:       1 !important;
+  height:     1px !important;
+  background: linear-gradient(to right, var(--e-teal), transparent) !important;
+  opacity:    0.35 !important;
+}
+
+/* ═══════════════════════════════════════
+   WIDGETS
+   ═══════════════════════════════════════ */
+.widget-container {
+  background:    rgba(0, 0, 0, 0.15) !important;
+  border-top:    1px solid var(--e-border) !important;
+  border-radius: 0 0 var(--e-radius) var(--e-radius) !important;
+}
+
+.primary-text {
+  color:       var(--e-fg) !important;
+  font-family: var(--e-mono) !important;
+  font-size:   0.875rem !important;
+  font-weight: 500 !important;
+}
+
+.secondary-text {
+  color:          var(--e-muted) !important;
+  font-family:    var(--e-mono) !important;
+  font-size:      0.7rem !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+}
+
+/* ═══════════════════════════════════════
+   TAB NAVIGATION
+   ═══════════════════════════════════════ */
+[role="tab"] {
+  font-family:    var(--e-mono) !important;
+  font-size:      0.75rem !important;
+  font-weight:    600 !important;
+  letter-spacing: 0.12em !important;
+  text-transform: uppercase !important;
+  color:          var(--e-muted) !important;
+  border-radius:  4px !important;
+  transition:     color 0.15s var(--e-ease), background 0.15s var(--e-ease) !important;
+}
+
+[role="tab"]:hover {
+  color:      var(--e-fg) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+[role="tab"][aria-selected="true"] {
+  color:      var(--e-teal) !important;
+  background: color-mix(in srgb, var(--e-teal) 10%, transparent) !important;
+}
+
+/* ═══════════════════════════════════════
+   STATUS DOTS — teal
+   ═══════════════════════════════════════ */
+.bg-emerald-500 {
+  background-color: var(--e-teal) !important;
+}
+
+/* ═══════════════════════════════════════
+   TEXT SELECTION
+   ═══════════════════════════════════════ */
+::selection {
+  background: color-mix(in srgb, var(--e-amber) 30%, transparent) !important;
+  color:      var(--e-fg) !important;
+}
+
+/* ═══════════════════════════════════════
+   SCROLLBAR
+   ═══════════════════════════════════════ */
+::-webkit-scrollbar       { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background:    color-mix(in srgb, var(--e-teal) 25%, transparent);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--e-teal) 45%, transparent);
+}
+
+/* ═══════════════════════════════════════
+   REVEAL ANIMATION
+   ═══════════════════════════════════════ */
+@keyframes e-reveal {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.service-card {
+  animation: e-reveal 0.3s var(--e-ease) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .service-card { animation: none !important; transition: none !important; }
+}
+
+/* ═══════════════════════════════════════
+   MOBILE FOOTER
+   ═══════════════════════════════════════ */
+#merox-home-button { display: none; }
+
+@media (max-width: 768px) {
+  #merox-home-button {
+    display:          flex;
+    position:         fixed;
+    bottom: 0; left: 0; right: 0;
+    width:            100%;
+    z-index:          9999;
+    background-color: var(--e-teal);
+    color:            #0D1017;
+    border:           2px solid var(--e-teal);
+    box-shadow:       0 -3px 0 color-mix(in srgb, var(--e-teal) 60%, black);
+    border-radius:    0;
+    padding:          14px 20px;
+    font-family:      var(--e-mono);
+    font-size:        0.75rem;
+    font-weight:      700;
+    letter-spacing:   0.12em;
+    text-transform:   uppercase;
+    text-decoration:  none;
+    align-items:      center;
+    justify-content:  center;
+    gap:              8px;
+    min-height:       50px;
+    box-sizing:       border-box;
+    transition:       box-shadow 0.25s var(--e-ease), transform 0.25s var(--e-ease);
+  }
+  #merox-home-button:active { box-shadow: none; transform: translateY(3px); }
+  #merox-home-button svg {
+    width: 15px; height: 15px;
+    fill: none; stroke: currentColor; stroke-width: 2;
+  }
+  body { padding-bottom: 50px; }
+}

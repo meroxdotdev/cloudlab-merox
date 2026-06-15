@@ -15,11 +15,7 @@ services:
       network-cloud-merox:
         ipv4_address: 172.25.10.33
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.guacamole.rule=Host(`ssh.cloud.merox.dev`)"
-      - "traefik.http.routers.guacamole.entrypoints=https"
-      - "traefik.http.routers.guacamole.tls.certresolver=cloudflare"
-      - "traefik.http.services.guacamole.loadbalancer.server.port=8080"
+      - "traefik.enable=false"
 
 volumes:
   guacamole_config:
